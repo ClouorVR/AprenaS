@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="icon" type="image/png" href="Aprena.png">
-<title>ClouorVR Console · Aprena</title>
+<title>AprenaS Console</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
@@ -72,6 +72,7 @@
     --serif: "Newsreader", Georgia, serif;
     --sans: "Instrument Sans", system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, monospace;
+    --r: 6px; --r-lg: 10px;
   }
 
   * { box-sizing: border-box; }
@@ -87,7 +88,7 @@
   .uppercase.tracking-widest, .uppercase.tracking-wider { font-family: var(--mono); font-weight: 500 !important; letter-spacing: .12em; }
 
   /* One corner rule for the whole app, including Tailwind utilities. */
-  .rounded, .rounded-sm, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl { border-radius: 0 !important; }
+  .rounded, .rounded-sm, .rounded-md { border-radius: var(--r) !important; } .rounded-lg, .rounded-xl, .rounded-2xl { border-radius: var(--r-lg) !important; }
   .rounded-full { border-radius: 50%; }
 
   ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -236,6 +237,128 @@
   .seg button + button { border-left: 1px solid var(--hairline-soft); }
   .seg button.active { background: var(--text); color: var(--bg); }
   .seg button:hover:not(.active) { color: var(--text); }
+
+  /* ============================================================
+     v3 layout. Same paper, ink and brick; a different build.
+     - The sidebar is a solid ink spine in every theme, like the
+       cloth spine of a ledger. It carries its own dark tokens so
+       everything inside it (project list, buttons) just works.
+     - The header is a masthead: project as a mono kicker, the
+       page name large in Newsreader, closed by a 2px ink rule.
+     - Forms stop being grey boxes. They are ruled sheets: an ink
+       rule on top, underlined fields, sticky while the list scrolls.
+     - Every "add another" control is a dashed strip the width of
+       the form, so it reads as "a blank line goes here".
+     ============================================================ */
+
+  /* Fields can shrink inside flex/grid rows. Without this a text
+     input keeps a ~150px minimum and pushes rows out of their card. */
+  input, select, textarea { min-width: 0; max-width: 100%; }
+
+  /* ---- Spine ---- */
+  #sidebar { background: var(--panel) !important; border-right: 1px solid var(--hairline-soft) !important; }
+  #mainNav { counter-reset: nav; }
+  .nav-sec { padding: 20px 14px 8px; color: var(--accent-text); opacity: .85; }
+  .nav-item { border-left: 0; position: relative; padding-left: 16px !important; }
+  .nav-item::after { counter-increment: nav; content: counter(nav, decimal-leading-zero); margin-left: auto; font: 400 10px var(--mono); color: var(--text-faint); padding-left: 8px; }
+  .nav-item .nav-badge + * , .nav-item:has(.nav-badge:not(.hidden))::after { margin-left: 8px; }
+  .nav-item svg { opacity: .7; }
+  .nav-item:hover { background: transparent; color: var(--text); }
+  .nav-item:hover svg { opacity: 1; }
+  .nav-item.active { background: var(--text); color: var(--bg); }
+  .nav-item.active svg { opacity: 1; }
+  .nav-item.active::after { color: var(--bg); opacity: .6; }
+  .nav-item.active::before { content: ""; position: absolute; left: 6px; top: 50%; width: 4px; height: 4px; margin-top: -2px; border-radius: 50%; background: var(--accent); }
+
+  /* ---- Masthead ---- */
+  .masthead { flex-direction: column; justify-content: flex-end; gap: 6px; padding: 26px 40px 16px; border-bottom: 2px solid var(--text); }
+  .mast-kicker { font: 500 10px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
+  .mast-kicker:empty::before { content: "AprenaS"; }
+  .mast-title { font: 500 38px/1 var(--serif); letter-spacing: -.025em; }
+  main#mainContent { padding-top: 36px !important; }
+
+  /* ---- Lede: the one paragraph that explains a page, set like a
+     standfirst instead of small grey help text ---- */
+  .lede { font: 400 18px/1.5 var(--serif); color: var(--text-dim); max-width: 60ch; margin-bottom: 32px; }
+  .lede code { font-size: 13px; }
+
+  /* ---- Ruled-sheet forms ---- */
+  .panel.h-fit, #tab-groups .lg\:col-span-2 > .panel {
+    background: transparent; border: 0; border-top: 2px solid var(--text);
+    padding: 18px 0 0 !important; position: sticky; top: 0;
+  }
+  .panel.h-fit > h3:first-child, #tab-groups .lg\:col-span-2 > .panel > h3:first-child {
+    font: 500 22px/1.15 var(--serif) !important; letter-spacing: -.01em !important; text-transform: none !important;
+    color: var(--text) !important; margin-bottom: 18px !important;
+  }
+  .panel.h-fit h4 { margin-top: 18px; padding-bottom: 6px; border-bottom: 1px solid var(--hairline-soft); color: var(--accent-text) !important; }
+  .panel.h-fit .input-field, .panel.h-fit select, #tab-groups .panel .input-field {
+    background: transparent; border: 0; border-bottom: 1px solid var(--text-faint); padding-left: 0 !important; padding-right: 4px !important;
+    transition: border-color .12s ease;
+  }
+  .panel.h-fit select.input-field { padding-left: 0 !important; }
+  .panel.h-fit textarea.input-field { border: 1px solid var(--hairline-soft); padding: 8px 10px !important; }
+  .panel.h-fit .input-field:focus, #tab-groups .panel .input-field:focus, .panel.h-fit textarea.input-field:focus { border-color: var(--accent); outline: none; }
+  .panel.h-fit .input-field:focus-visible { outline: none; box-shadow: 0 1px 0 var(--accent); }
+  .panel.h-fit select[multiple] { border: 1px solid var(--hairline-soft); padding: 6px !important; }
+  @media (max-width: 1023px) { .panel.h-fit { position: static; } }
+
+  .add-strip { display: block; width: 100%; text-align: left; padding: 9px 12px; border: 1px dashed var(--text-faint); color: var(--text-dim);
+    font: 500 11px var(--mono); letter-spacing: .06em; transition: color .12s ease, border-color .12s ease, background .12s ease; }
+  .add-strip:hover { color: var(--text); border-color: var(--text); border-style: solid; }
+
+  /* ---- Experiment variants: lettered lines, not grey boxes ---- */
+  #expVariants { counter-reset: v; }
+  .vrow { display: grid; grid-template-columns: 22px minmax(0,1fr) 64px 20px; gap: 6px 10px; align-items: end; padding: 10px 0 12px; border-bottom: 1px dashed var(--hairline-soft); }
+  .vrow:first-child { padding-top: 4px; }
+  .vletter::before { counter-increment: v; content: counter(v, upper-alpha); font: 500 18px/1 var(--serif); color: var(--accent-text); }
+  .vletter { align-self: center; }
+  .vwrap { display: flex; align-items: baseline; gap: 4px; }
+  .vwrap input { width: 100%; }
+  .vwrap span { font: 400 10px var(--mono); color: var(--text-faint); }
+  .vrow .xbtn { align-self: center; }
+  .vrow textarea { grid-column: 2 / -1; resize: vertical; }
+  .vrow:only-child .xbtn, .vrow:nth-last-child(2):first-child .xbtn { visibility: hidden; }
+
+  /* ---- Rule and item rows: underline fields too ---- */
+  .rule-row .input-field { border-width: 0 0 1px; background: transparent; }
+
+  /* ---- Lists on the right: a column rule separates them from the sheet ---- */
+  @media (min-width: 1024px) {
+    .tab-content > .grid > .lg\:col-span-3, .tab-content > div > .lg\:col-span-3 { border-left: 1px solid var(--hairline-soft); padding-left: 32px; margin-left: -8px; }
+  }
+
+  /* ---- Buttons: primary gets an offset ink shadow on hover
+     instead of just inverting ---- */
+  .btn-accent { letter-spacing: .01em; }
+  .btn-accent:hover:not(:disabled) { background: var(--bg); color: var(--text); box-shadow: 3px 3px 0 var(--accent); transform: translate(-1px,-1px); }
+  .btn-accent { transition: background .12s ease, color .12s ease, box-shadow .12s ease, transform .12s ease; }
+
+  /* ---- Segmented switch: underline tabs instead of a boxed toggle ---- */
+  .seg { border: 0; gap: 18px; }
+  .seg button { padding: 6px 0; border-bottom: 2px solid transparent; }
+  .seg button + button { border-left: 0; }
+  .seg button.active { background: transparent; color: var(--text); border-bottom-color: var(--accent); }
+
+  /* ---- KPI strip: bigger lead number, brick rule on top ---- */
+  .kpi-strip { border-top: 0; border-bottom: 2px solid var(--text); }
+  .kpi-strip > div { padding-top: 4px; }
+  .kpi-strip > div:first-child .num { font-size: 76px; }
+
+  /* ---- Section headings: number hangs in the margin ---- */
+  .sec-h { border-top: 0; padding-top: 8px; font-size: 24px; }
+  .sec-h .n { min-width: 28px; }
+  .sec-h::after { content: ""; flex: 1; height: 1px; background: var(--hairline-soft); align-self: center; order: 2; }
+  .sec-h .aside { order: 3; margin-left: 0; }
+
+  /* Corners: 6px on things you press or type in, 10px on surfaces
+     that hold other things. Underlined fields stay square. */
+  .btn-accent, .btn-ghost, .btn-danger, .add-strip, .nav-item, .panel.h-fit textarea.input-field, .panel.h-fit select[multiple],
+  .input-field:not(.panel.h-fit .input-field):not(.rule-row .input-field), .pill, .mono-chip, .lede code, .toast, .chart-tip, .nav-badge, .oauth-btn { border-radius: var(--r); }
+  .panel:not(.h-fit), .panel-raised, .keycard, .code-stub, .split { border-radius: var(--r-lg); }
+  .split { overflow: hidden; }
+  .panel.h-fit { border-radius: 0; }
+  #projectsListContainer > * { border-radius: var(--r); }
 </style>
 </head>
 <body>
@@ -248,7 +371,7 @@
       <img src="Aprena.png" alt="Aprena" class="brand-logo" onerror="this.remove()">
       <span class="text-[10px] uppercase tracking-widest pl-3" style="color: var(--text-faint); border-left: 1px solid var(--hairline-soft);">LiveOps console</span>
     </div>
-    <h1 class="font-display" style="font-size: 52px; line-height: .95; letter-spacing: -.025em; font-weight: 500;">ClouorVR</h1>
+    <h1 class="font-display" style="font-size: 52px; line-height: .95; letter-spacing: -.025em; font-weight: 500;">Aprena<span style="color: var(--accent-text)">S</span></h1>
     <p class="text-sm mt-3 mb-8" style="color: var(--text-dim);">The backend behind your VR game's players, economy and live events. Sign in to reach your projects.</p>
 
     <div id="hcapBlock" class="h-captcha mb-4 flex justify-center" data-sitekey="6cca0de8-3dde-409a-b7d8-680a34407aa4" data-callback="unlockLogin"></div>
@@ -293,7 +416,7 @@
     <div class="p-5 border-b flex items-center gap-3" style="border-color: var(--hairline-soft);">
       <img src="Aprena.png" alt="Aprena" class="brand-logo shrink-0" style="height:22px" onerror="this.remove()">
       <div class="min-w-0 flex-1 pl-3" style="border-left: 1px solid var(--hairline-soft);">
-        <div class="font-display text-base leading-tight" style="font-weight:500">ClouorVR</div>
+        <div class="font-display text-base leading-tight" style="font-weight:500">Aprena<span style="color: var(--accent-text)">S</span></div>
         <div id="userDisplayTag" class="text-[10px] font-mono truncate" style="color: var(--text-faint);"></div>
       </div>
       <button onclick="closeMobileSidebar()" class="md:hidden px-2" aria-label="Close menu"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
@@ -347,9 +470,9 @@
       <button onclick="toggleTheme()" class="px-2" aria-label="Toggle theme"><svg id="themeIconMobile" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.5A8.5 8.5 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg></button>
     </div>
 
-    <header class="h-16 border-b hidden md:flex items-center px-8 gap-4 shrink-0" style="border-color: var(--hairline-soft);">
-      <h2 id="currentTabTitle" class="font-display text-2xl" style="font-weight:500">Overview</h2>
-      <span id="headerProjectName" class="text-[10px] uppercase tracking-widest ml-auto" style="color: var(--text-faint);"></span>
+    <header class="masthead hidden md:flex shrink-0">
+      <span id="headerProjectName" class="mast-kicker"></span>
+      <h2 id="currentTabTitle" class="mast-title">Overview</h2>
     </header>
 
     <main id="mainContent" class="flex-1 overflow-y-auto p-5 md:p-8 relative" tabindex="-1">
@@ -522,7 +645,7 @@
       <!-- CURRENCIES -->
       <div id="tab-currencies" class="tab-content hidden max-w-4xl mx-auto rise">
         <div class="flex justify-between items-center mb-6">
-          <p class="text-sm max-w-md" style="color: var(--text-dim);">Every economy in ClouorVR is custom - nothing is pre-loaded.</p>
+          <p class="text-sm max-w-md" style="color: var(--text-dim);">Every economy in AprenaS is custom - nothing is pre-loaded.</p>
           <button onclick="showCurrencyModal()" class="btn-accent font-bold px-5 py-2.5 text-sm shrink-0">New currency</button>
         </div>
         <div id="currencyCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
@@ -682,7 +805,7 @@
             <input id="segName" type="text" maxlength="60" class="w-full p-3 mb-4 input-field text-sm" placeholder="Name, e.g. Lapsed spenders">
             <p class="text-xs mb-2" style="color: var(--text-dim);">Players who match <b>every</b> rule:</p>
             <div id="segRules"></div>
-            <button onclick="addSegRule()" class="btn-ghost px-3 py-1.5 text-xs font-semibold mb-5">+ Rule</button>
+            <button onclick="addSegRule()" class="add-strip mb-5">+ Add rule</button>
             <p id="segPreview" class="text-xs mb-5 font-mono" style="color: var(--text-faint);"></p>
             <div class="flex gap-2">
               <button onclick="submitSegment()" class="btn-accent py-3 flex-1 text-sm">Save segment</button>
@@ -740,7 +863,7 @@
             </div>
             <h4 class="uppercase text-[10px] tracking-widest mb-2" style="color: var(--text-faint);">Items</h4>
             <div id="storeItemRows"></div>
-            <button onclick="addStoreItemRow()" class="btn-ghost px-3 py-1.5 text-xs font-semibold mb-5">+ Item</button>
+            <button onclick="addStoreItemRow()" class="add-strip mb-5">+ Add item</button>
             <label class="flex items-center gap-2 mb-5 text-xs" style="color: var(--text-dim);"><input type="checkbox" id="storeActive" checked> Open for business</label>
             <div class="flex gap-2">
               <button onclick="submitStore()" class="btn-accent py-3 flex-1 text-sm">Save store</button>
@@ -788,7 +911,7 @@
               <input id="dtName" type="text" maxlength="60" class="flex-1 p-2.5 input-field text-sm" placeholder="Name, e.g. Daily chest">
             </div>
             <div id="dtRows"></div>
-            <button onclick="addDropRow()" class="btn-ghost px-3 py-1.5 text-xs font-semibold mb-5">+ Outcome</button>
+            <button onclick="addDropRow()" class="add-strip mb-5">+ Add outcome</button>
             <div class="flex gap-2">
               <button onclick="submitDropTable()" class="btn-accent py-3 flex-1 text-sm">Save table</button>
               <button onclick="resetDropForm()" id="dtCancelBtn" class="btn-ghost py-3 px-4 text-sm font-semibold hidden">Cancel</button>
@@ -811,7 +934,7 @@
             <input id="expMetric" type="text" maxlength="64" list="knownEvents" class="w-full p-2.5 mb-4 input-field text-sm font-mono" placeholder="Success event, e.g. purchase">
             <h4 class="uppercase text-[10px] tracking-widest mb-2" style="color: var(--text-faint);">Variants</h4>
             <div id="expVariants"></div>
-            <button onclick="addVariantRow()" class="btn-ghost px-3 py-1.5 text-xs font-semibold mb-5">+ Variant</button>
+            <button onclick="addVariantRow()" class="add-strip mb-5">+ Add variant</button>
             <div class="flex gap-2">
               <button onclick="submitExperiment()" class="btn-accent py-3 flex-1 text-sm">Save as draft</button>
               <button onclick="resetExperimentForm()" id="expCancelBtn" class="btn-ghost py-3 px-4 text-sm font-semibold hidden">Cancel</button>
@@ -3112,10 +3235,12 @@ function renderDropTables() {
 let experimentsArray = [];
 function variantRowHtml(v) {
   const ov = Object.entries(v.overrides || {}).map(([k, x]) => `${k}=${x}`).join("\n");
-  return `<div class="panel-raised p-3 mb-2 vrow">
-    <div class="flex gap-2 mb-2"><input class="vn input-field p-2 text-xs font-mono flex-1" placeholder="variant name" value="${escapeHtml(v.name || "")}">
-      <input class="vw input-field p-2 text-xs w-20" type="number" min="1" title="weight" value="${v.weight ?? 50}"><button class="xbtn px-1" title="Remove">×</button></div>
-    <textarea class="vo input-field p-2 text-xs font-mono w-full" rows="2" placeholder="title_data_key=value (one per line)">${escapeHtml(ov)}</textarea></div>`;
+  return `<div class="vrow">
+    <span class="vletter" aria-hidden="true"></span>
+    <input class="vn input-field text-xs font-mono" aria-label="Variant name" placeholder="variant name" value="${escapeHtml(v.name || "")}">
+    <label class="vwrap"><input class="vw input-field text-xs" type="number" min="1" aria-label="Weight" value="${v.weight ?? 50}"><span>wt</span></label>
+    <button class="xbtn" title="Remove variant" aria-label="Remove variant">×</button>
+    <textarea class="vo input-field text-xs font-mono" rows="2" aria-label="Title Data overrides" placeholder="title_data_key=value, one per line">${escapeHtml(ov)}</textarea></div>`;
 }
 function readVariants() {
   return [...document.querySelectorAll("#expVariants .vrow")].map((r) => {
@@ -3368,7 +3493,7 @@ async function submitWebhook() {
   ["hookEvent", "hookUrl"].forEach((id) => (document.getElementById(id).value = ""));
   pendingRevealTarget = "webhook";
   document.getElementById("revealTitle").innerText = "Webhook signing secret";
-  document.getElementById("revealDesc").innerText = "Your server uses this to check a call really came from ClouorVR (HMAC-SHA256 of the X-ClouorVR-Timestamp header, a dot, and the raw body). It's only shown now.";
+  document.getElementById("revealDesc").innerText = "Your server uses this to check a call really came from AprenaS (HMAC-SHA256 of the X-ClouorVR-Timestamp header, a dot, and the raw body). It's only shown now.";
   document.getElementById("apiKeyRevealInput").value = secret;
   document.getElementById("apiKeyRevealModal").classList.remove("hidden");
   loadWebhooks();
