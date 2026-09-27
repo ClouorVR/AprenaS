@@ -3,150 +3,238 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<link rel="icon" href="data:,">
-<title>ClouorVR - Field Console</title>
+<link rel="icon" type="image/png" href="Aprena.png">
+<title>ClouorVR Console · Aprena</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   /* ============================================================
-     PALETTE - ink slate base, raspberry-berry accent, sea-teal
-     secondary. Chosen because it's a warm/cool complementary pair
-     that doesn't read as "tech blue" or "SaaS orange" - it feels
-     like a considered brand, not a Tailwind demo.
+     ClouorVR is an Aprena product, so it wears Aprena's clothes:
+     the same warm paper / ink / brick system as aprena's legal
+     pages, not a separate "dashboard" look.
+
+     Rules this file follows (so later edits stay consistent):
+     - Ink is the logo's own black. Primary buttons are solid ink,
+       never a colored fill.
+     - Brick marks structure and selection: the active nav item,
+       section numbers, focus, links. A brick FILL only ever means
+       "this cannot be undone".
+     - Olive = live / healthy. Ochre (borrowed from the privacy
+       page's "needs confirmation" notes) = warning / draft.
+     - No rounded corners. It's an operations ledger; it should feel
+       printed and exact, not soft. Round shapes are reserved for
+       status dots, where round means "a light that is on".
+     - Newsreader for things you read (titles, numbers you care
+       about), Instrument Sans for things you operate, JetBrains
+       Mono for things you'd copy (IDs, keys, labels, timestamps).
      ============================================================ */
-  :root {
-    --bg: #0a0b0f; --panel: #14161c; --panel-raised: #1b1e26;
-    --hairline: rgba(196,88,132,0.14); --hairline-soft: rgba(255,255,255,0.06);
-    --text: #eceef2; --text-dim: #8f94a3; --text-faint: #5b606f;
-    --accent: #c45884; --accent-text: #d97ea3; --accent-soft: rgba(196,88,132,0.14);
-    --moss: #4f9e8a; --moss-text: #6cbba7; --moss-soft: rgba(79,158,138,0.14);
-    --danger: #c15b47; --danger-text: #e08d7c; --danger-soft: rgba(193,91,71,0.14);
-    --backdrop: rgba(10,11,15,0.85);
+  :root, [data-theme="dark"] {
+    --bg: #15130f; --panel: #1b1914; --panel-raised: #24211b;
+    --hairline: rgba(224,121,92,0.32); --hairline-soft: #37322a;
+    --text: #efe9dd; --text-dim: #b3ab9c; --text-faint: #8c8475;
+    --accent: #e0795c; --accent-text: #eb957c; --accent-soft: rgba(224,121,92,0.13);
+    --moss: #9bb57a; --moss-text: #b3cb93; --moss-soft: rgba(155,181,122,0.13);
+    --danger: #e0795c; --danger-text: #f0a08a; --danger-soft: rgba(224,121,92,0.13);
+    --warn-bg: #3b3212; --warn-ink: #f3dd8a;
+    --backdrop: rgba(21,19,15,0.86);
+    --logo-filter: invert(1);
     color-scheme: dark;
   }
   [data-theme="light"] {
-    --bg: #f7f4f2; --panel: #ffffff; --panel-raised: #efe9e6;
-    --hairline: rgba(150,50,90,0.18); --hairline-soft: rgba(20,15,20,0.08);
-    --text: #221f22; --text-dim: #5c5860; --text-faint: #8a8590;
-    --accent: #a8446c; --accent-text: #8f3459; --accent-soft: rgba(168,68,108,0.14);
-    --moss: #3d7d6b; --moss-text: #2f6354; --moss-soft: rgba(61,125,107,0.14);
-    --danger: #a5432f; --danger-text: #8f3620; --danger-soft: rgba(165,67,47,0.14);
-    --backdrop: rgba(239,233,230,0.9);
+    --bg: #f5f1ea; --panel: #fbf8f3; --panel-raised: #ece6db;
+    --hairline: rgba(162,56,31,0.28); --hairline-soft: #d6cebf;
+    --text: #16140f; --text-dim: #4a463e; --text-faint: #6e685c;
+    --accent: #a2381f; --accent-text: #8a2d17; --accent-soft: rgba(162,56,31,0.09);
+    --moss: #4d6b2f; --moss-text: #3d5725; --moss-soft: rgba(77,107,47,0.11);
+    --danger: #a2381f; --danger-text: #8a2d17; --danger-soft: rgba(162,56,31,0.09);
+    --warn-bg: #fff4c7; --warn-ink: #5a4600;
+    --backdrop: rgba(245,241,234,0.9);
+    --logo-filter: none;
     color-scheme: light;
   }
   [data-theme="superdark"] {
-    --bg: #000000; --panel: #060608; --panel-raised: #0d0e12;
-    --hairline: rgba(196,88,132,0.18); --hairline-soft: rgba(255,255,255,0.045);
-    --text: #edeef0; --text-dim: #83879a; --text-faint: #4a4d58;
-    --accent: #c45884; --accent-text: #d97ea3; --accent-soft: rgba(196,88,132,0.12);
-    --moss: #4f9e8a; --moss-text: #6cbba7; --moss-soft: rgba(79,158,138,0.12);
-    --danger: #c15b47; --danger-text: #e08d7c; --danger-soft: rgba(193,91,71,0.12);
-    --backdrop: rgba(0,0,0,0.92);
+    --bg: #0b0a08; --panel: #11100d; --panel-raised: #1a1813;
+    --hairline: rgba(224,121,92,0.30); --hairline-soft: #2a2620;
+    --text: #efe9dd; --text-dim: #aaa293; --text-faint: #857d6f;
+    --accent: #e0795c; --accent-text: #eb957c; --accent-soft: rgba(224,121,92,0.11);
+    --moss: #9bb57a; --moss-text: #b3cb93; --moss-soft: rgba(155,181,122,0.11);
+    --danger: #e0795c; --danger-text: #f0a08a; --danger-soft: rgba(224,121,92,0.11);
+    --warn-bg: #2e2710; --warn-ink: #f3dd8a;
+    --backdrop: rgba(11,10,8,0.92);
+    --logo-filter: invert(1);
     color-scheme: dark;
+  }
+  :root {
+    --serif: "Newsreader", Georgia, serif;
+    --sans: "Instrument Sans", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
   }
 
   * { box-sizing: border-box; }
   html, body { height: 100%; }
-  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); transition: background 0.2s ease, color 0.2s ease; letter-spacing: -0.1px; }
-  /* Serif display font - a considered, editorial choice instead of another
-     geometric sans. Immediately signals "someone picked this" rather than
-     "the default AI stack". */
-  .font-display { font-family: 'Fraunces', serif; font-optical-sizing: auto; letter-spacing: -0.2px; }
-  .font-mono { font-family: 'IBM Plex Mono', monospace; }
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--hairline-soft); border-radius: 3px; }
+  body { font: 400 14px/1.55 var(--sans); background: var(--bg); color: var(--text); transition: background .2s ease, color .2s ease; }
+  .font-display { font-family: var(--serif); font-optical-sizing: auto; letter-spacing: -0.01em; }
+  .font-display.font-bold { font-weight: 500; }
+  .font-mono { font-family: var(--mono); }
+  a { color: var(--accent-text); text-underline-offset: 3px; }
 
-  @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  /* Every small uppercase label in the app becomes the same mono
+     "kicker" the privacy page uses, instead of bold tracked Inter. */
+  .uppercase.tracking-widest, .uppercase.tracking-wider { font-family: var(--mono); font-weight: 500 !important; letter-spacing: .12em; }
+
+  /* One corner rule for the whole app, including Tailwind utilities. */
+  .rounded, .rounded-sm, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl { border-radius: 0 !important; }
+  .rounded-full { border-radius: 50%; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--hairline-soft); }
+
+  /* Tab changes swap content quickly; nothing slides in. */
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
-  .rise { animation: riseIn 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
-  .fade { animation: fadeIn 0.3s ease forwards; }
-  .skeleton { background: linear-gradient(90deg, var(--panel-raised) 0%, var(--hairline-soft) 50%, var(--panel-raised) 100%); background-size: 800px 100%; animation: shimmer 1.4s infinite linear; border-radius: 4px; }
-  @media (prefers-reduced-motion: reduce) { .rise, .fade, .skeleton { animation: none; } }
+  .rise, .fade { animation: fadeIn .14s ease-out both; }
+  .skeleton { background: linear-gradient(90deg, var(--panel-raised) 0%, var(--hairline-soft) 50%, var(--panel-raised) 100%); background-size: 800px 100%; animation: shimmer 1.4s infinite linear; }
+  @media (prefers-reduced-motion: reduce) { .rise, .fade, .skeleton, .toast { animation: none; } }
 
-  .panel { background: var(--panel); border: 1px solid var(--hairline-soft); border-radius: 6px; }
-  .panel-raised { background: var(--panel-raised); border: 1px solid var(--hairline-soft); border-radius: 6px; }
-  .toast { animation: riseIn 0.25s forwards, fadeIn 0.25s reverse forwards 2.6s; }
+  .panel { background: var(--panel); border: 1px solid var(--hairline-soft); }
+  .panel-raised { background: var(--panel-raised); border: 1px solid var(--hairline-soft); }
+  .toast { animation: fadeIn .15s ease-out both; border-left: 3px solid var(--text) !important; }
 
-  /* Keycard - the one element that gets a distinct treatment: a soft
-     diagonal gradient plus a thin top accent line, so it reads as the
-     "important" surface rather than another identical rounded box. */
-  .keycard { position: relative; background: linear-gradient(155deg, var(--panel-raised) 0%, var(--panel) 100%); border: 1px solid var(--hairline); border-radius: 6px; overflow: hidden; }
-  .keycard::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent) 0%, transparent 85%); }
+  /* Keycard: the one surface holding secrets. A heavy ink top rule,
+     like the privacy page's tables, instead of a gradient. */
+  .keycard { background: var(--panel); border: 1px solid var(--hairline-soft); border-top: 2px solid var(--text); }
 
-  /* Buttons - sharper corners than the rest of the UI on purpose: the
-     one place we want a click target to feel deliberate, not soft. */
-  .btn-accent { background: var(--accent); color: #1c0812; border-radius: 3px; font-weight: 600; position: relative; overflow: hidden; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-  .btn-accent::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, #e07aa0, var(--accent)); opacity: 0; transition: opacity 0.2s ease; }
-  .btn-accent span, .btn-accent svg { position: relative; z-index: 1; }
-  .btn-accent:hover::before { opacity: 1; }
-  .btn-accent:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -6px rgba(196,88,132,0.55); }
-  .btn-accent:active { transform: translateY(0); }
-  .btn-accent:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-ghost { background: var(--panel-raised); border: 1px solid var(--hairline-soft); color: var(--text); border-radius: 4px; transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease; }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent-text); }
+  /* Primary = ink. Hover inverts, like pressing a stamp. */
+  .btn-accent { background: var(--text); color: var(--bg); border: 1.5px solid var(--text); font-weight: 600; transition: background .14s ease, color .14s ease; }
+  .btn-accent:hover { background: transparent; color: var(--text); }
+  .btn-accent:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-ghost { background: transparent; border: 1px solid var(--hairline-soft); color: var(--text); transition: border-color .14s ease, color .14s ease, background .14s ease; }
+  .btn-ghost:hover { border-color: var(--text); }
   .btn-ghost.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
-  .input-field { background: var(--bg); border: 1px solid var(--hairline-soft); color: var(--text); border-radius: 4px; }
-  .input-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  .nav-item { color: var(--text-dim); border: 1px solid transparent; border-left: 2px solid transparent; border-radius: 0 4px 4px 0; transition: all 0.15s ease; }
-  .nav-item:hover { background: var(--panel-raised); color: var(--text); border-left-color: var(--hairline); }
-  .nav-item.active { background: var(--accent-soft); color: var(--accent-text); border-left-color: var(--accent); font-weight: 700; }
-  .oauth-btn { transition: transform 0.15s ease, background 0.15s ease; border-radius: 4px; }
-  .oauth-btn:active { transform: scale(0.98); }
+  .btn-danger { background: var(--danger); color: var(--bg); border: 1.5px solid var(--danger); font-weight: 600; transition: background .14s ease, color .14s ease; }
+  .btn-danger:hover { background: transparent; color: var(--danger-text); }
 
-  /* Deliberate asymmetry on the four overview stat tiles instead of four
-     identical rounded boxes - each gets its own small distinguishing
-     treatment so the eye doesn't skim past them as one repeated unit. */
-  #tab-overview .grid.grid-cols-2 > .panel:nth-child(1) { border-radius: 3px; }
-  #tab-overview .grid.grid-cols-2 > .panel:nth-child(2) { border-left: 3px solid var(--moss); border-radius: 0 6px 6px 0; }
-  #tab-overview .grid.grid-cols-2 > .panel:nth-child(3) { border-radius: 10px; }
-  #tab-overview .grid.grid-cols-2 > .panel:nth-child(4) { border-top: 2px solid var(--accent); border-radius: 0 0 6px 6px; }
+  .input-field { background: var(--panel); border: 1px solid var(--hairline-soft); border-bottom-color: var(--text-faint); color: var(--text); font-family: var(--sans); }
+  .input-field:focus { outline: none; border-color: var(--text); }
+  .input-field::placeholder { color: var(--text-faint); }
 
-  a.skip-link { position: absolute; left: -999px; top: 0; background: var(--accent); color: #1c0812; padding: 10px 16px; z-index: 200; border-radius: 0 0 6px 0; font-weight: 700; font-size: 13px; }
+  .nav-sec { font: 500 10px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-faint); padding: 16px 14px 6px; }
+  .nav-sec:first-child { padding-top: 2px; }
+  .nav-item { color: var(--text-dim); border-left: 2px solid transparent; transition: color .12s ease, background .12s ease, border-color .12s ease; }
+  .nav-item:hover { color: var(--text); background: var(--panel-raised); }
+  .nav-item.active { color: var(--text); border-left-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  .oauth-btn { transition: background .14s ease, border-color .14s ease; }
+
+  .brand-logo { height: 26px; width: auto; filter: var(--logo-filter); }
+
+  /* Overview numbers: one ruled strip, read left to right, not four
+     floating tiles. Players leads because it's the number people open
+     the console to check. */
+  .kpi-strip { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; border-top: 2px solid var(--text); border-bottom: 1px solid var(--hairline-soft); }
+  .kpi-strip > div { padding: 16px 20px 18px 0; }
+  .kpi-strip > div + div { padding-left: 20px; border-left: 1px solid var(--hairline-soft); }
+  .kpi-strip .num { font: 500 44px/1 var(--serif); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .kpi-strip > div:first-child .num { font-size: 64px; }
+  .kpi-strip .lbl { font: 500 10px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--moss); display: inline-block; }
+  @media (max-width: 700px) {
+    .kpi-strip { grid-template-columns: 1fr 1fr; }
+    .kpi-strip > div:nth-child(3) { padding-left: 0; border-left: 0; }
+    .kpi-strip > div:nth-child(n+3) { border-top: 1px solid var(--hairline-soft); }
+    .kpi-strip > div:first-child .num { font-size: 48px; }
+    .kpi-strip .num { font-size: 34px; }
+  }
+
+  /* Section headings inside tabs: serif title with a mono number,
+     the exact pattern of the privacy page's h2. */
+  .sec-h { display: flex; align-items: baseline; gap: 12px; font: 500 22px/1.2 var(--serif); letter-spacing: -.01em; padding-top: 18px; border-top: 1px solid var(--hairline-soft); margin: 0 0 14px; }
+  .sec-h .n { font: 500 11px/1 var(--mono); color: var(--accent-text); letter-spacing: .08em; }
+  .sec-h .aside { margin-left: auto; font: 400 12px/1.3 var(--sans); color: var(--text-faint); }
+  .lede { color: var(--text-dim); font-size: 14px; max-width: 62ch; margin-bottom: 20px; }
+  .lede code, .mono-chip { font: 500 12px var(--mono); color: var(--text); background: var(--panel-raised); padding: 1px 5px; }
+
+  /* Charts: single-series bars in ink-dim; hover row + tooltip. */
+  .chart { position: relative; }
+  .chart svg { display: block; width: 100%; height: 150px; overflow: visible; }
+  .chart .bar { fill: var(--text-dim); }
+  .chart .bar.on { fill: var(--text); }
+  .chart .base { stroke: var(--text); stroke-width: 1; }
+  .chart .grid { stroke: var(--hairline-soft); stroke-width: 1; }
+  .chart .axis { font: 400 10px var(--mono); fill: var(--text-faint); }
+  .chart-tip { position: absolute; pointer-events: none; background: var(--text); color: var(--bg); font: 500 11px/1.35 var(--mono); padding: 6px 8px; white-space: nowrap; transform: translate(-50%, -100%); margin-top: -8px; display: none; z-index: 5; }
+
+  /* Generic "ledger" list rows used across the new tabs. */
+  .row { display: grid; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--hairline-soft); }
+  .row:last-child { border-bottom: 0; }
+  .pill { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 4px 6px; border: 1px solid currentColor; display: inline-block; }
+  .pill.live { color: var(--moss-text); } .pill.draft { color: var(--warn-ink); background: var(--warn-bg); border-color: transparent; } .pill.off { color: var(--text-faint); }
+  .rule-row { display: grid; grid-template-columns: 1.1fr .8fr 1fr 28px; gap: 6px; margin-bottom: 6px; }
+  .rule-row > * { min-width: 0; }
+  .item-row { grid-template-columns: 96px 1fr 18px !important; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px dashed var(--hairline-soft); }
+  .item-row .sp { grid-column: 1; grid-row: 2; } .item-row .sc { grid-column: 2; grid-row: 2; } .item-row .xbtn { grid-column: 3; grid-row: 1; }
+  .xbtn { color: var(--text-faint); font: 500 14px var(--mono); }
+  .xbtn:hover { color: var(--danger-text); }
+
+  /* Drop tables: each outcome's chance drawn as a bar you can compare
+     at a glance; the rarest line gets the brick tick. */
+  .odds { height: 6px; background: var(--panel-raised); position: relative; }
+  .odds > i { position: absolute; inset: 0 auto 0 0; background: var(--text-dim); }
+  .odds.rare > i { background: var(--accent); }
+
+  /* Store shelf: a sale price shows the catalog price struck through. */
+  .was { text-decoration: line-through; color: var(--text-faint); margin-right: 6px; }
+  .off-tag { font: 600 10px var(--mono); color: var(--accent-text); margin-left: 6px; }
+
+  /* Experiments: variant split as one ruled bar. */
+  .split { display: flex; height: 22px; border: 1px solid var(--text); }
+  .split > span { display: flex; align-items: center; padding: 0 8px; font: 500 10px var(--mono); white-space: nowrap; overflow: hidden; }
+  .split > span + span { border-left: 1px solid var(--text); }
+  .split > span:nth-child(odd) { background: var(--panel-raised); }
+
+  a.skip-link { position: absolute; left: -999px; top: 0; background: var(--text); color: var(--bg); padding: 10px 16px; z-index: 200; font-weight: 600; font-size: 13px; }
   a.skip-link:focus { left: 0; }
-  button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+  main#mainContent:focus { outline: none; }
+  .nav-item.font-semibold { font-weight: 500; }
+  .nav-item.active { font-weight: 600; }
   #appShell { display: flex; height: 100vh; overflow: hidden; }
-  #sidebar { width: 288px; flex-shrink: 0; transition: transform 0.25s ease; }
+  #sidebar { width: 264px; flex-shrink: 0; transition: transform .25s ease; }
   #mobileTopbar { display: none; }
   #sidebarBackdrop { display: none; }
   @media (max-width: 900px) {
     #appShell { display: block; height: auto; min-height: 100vh; overflow: visible; }
-    #sidebar { position: fixed; top: 0; left: 0; height: 100%; z-index: 60; transform: translateX(-100%); box-shadow: 20px 0 60px rgba(0,0,0,0.3); }
+    #sidebar { position: fixed; top: 0; left: 0; height: 100%; z-index: 60; transform: translateX(-100%); box-shadow: 20px 0 60px rgba(0,0,0,.3); }
     #sidebar.open { transform: translateX(0); }
     #sidebarBackdrop.open { display: block; position: fixed; inset: 0; background: var(--backdrop); z-index: 55; }
     #mobileTopbar { display: flex; }
     #mainArea { height: auto; }
-    main#mainContent { padding: 1.1rem !important; }
+    main#mainContent { padding: 1rem !important; }
   }
 
-  /* ---- PlayFab-parity additions ----
-     Reports get a left rule whose weight scales with how many times the
-     target has been reported: a moderator should see "this one is on fire"
-     before reading a word. Codes render as ticket stubs (dashed perforation)
-     because that's what they are to the player. */
-  .nav-badge { margin-left: auto; font: 700 10px 'IBM Plex Mono', monospace; padding: 1px 6px; background: var(--danger-soft); color: var(--danger-text); border-radius: 2px; }
-  .report-row { border-left: 2px solid var(--hairline-soft); transition: background .15s ease, border-color .15s ease; }
-  .report-row.heat-2 { border-left: 3px solid var(--accent); }
-  .report-row.heat-3 { border-left: 5px solid var(--danger); }
-  .report-row:hover { background: var(--accent-soft); }
-  .code-stub { display: grid; grid-template-columns: 1fr auto; border: 1px solid var(--hairline); background: var(--panel-raised); border-radius: 0; }
-  .code-stub .stub-tail { border-left: 2px dashed var(--hairline); padding: 14px 16px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; min-width: 92px; }
-  .code-stub .stub-code { font: 600 17px 'IBM Plex Mono', monospace; letter-spacing: 2px; color: var(--accent-text); }
+  .nav-badge { margin-left: auto; font: 600 10px var(--mono); padding: 1px 6px; background: var(--danger-soft); color: var(--danger-text); }
+  .report-row { border-left: 2px solid var(--hairline-soft); transition: background .15s ease; }
+  .report-row.heat-2 { border-left: 3px solid var(--text-dim); }
+  .report-row.heat-3 { border-left: 5px solid var(--accent); }
+  .report-row:hover { background: var(--panel-raised); }
+  .code-stub { display: grid; grid-template-columns: 1fr auto; border: 1px solid var(--hairline-soft); background: var(--panel); }
+  .code-stub .stub-tail { border-left: 2px dashed var(--hairline-soft); padding: 14px 16px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; min-width: 92px; }
+  .code-stub .stub-code { font: 600 17px var(--mono); letter-spacing: 2px; color: var(--text); }
   .code-stub.spent { opacity: .55; }
-  .code-stub.spent .stub-code { text-decoration: line-through; text-decoration-color: var(--danger); }
+  .code-stub.spent .stub-code { text-decoration: line-through; text-decoration-color: var(--accent); }
   .news-post { border-bottom: 1px solid var(--hairline-soft); padding: 18px 4px 18px 0; }
-  .news-post.pinned { border-top: 2px solid var(--accent); padding-top: 16px; }
-  .news-post h4 { font-family: 'Fraunces', serif; font-size: 19px; line-height: 1.2; }
+  .news-post.pinned { border-top: 2px solid var(--text); padding-top: 16px; }
+  .news-post h4 { font-family: var(--serif); font-weight: 500; font-size: 20px; line-height: 1.2; }
   .ledger-delta.pos { color: var(--moss-text); } .ledger-delta.neg { color: var(--danger-text); }
-  .seg { display: inline-flex; border: 1px solid var(--hairline); }
-  .seg button { padding: 6px 12px; font-size: 11px; font-weight: 700; color: var(--text-dim); transition: background .12s ease, color .12s ease; }
-  .seg button + button { border-left: 1px solid var(--hairline); }
-  .seg button.active { background: var(--accent-soft); color: var(--accent-text); }
+  .seg { display: inline-flex; border: 1px solid var(--hairline-soft); }
+  .seg button { padding: 6px 12px; font: 500 11px var(--mono); color: var(--text-dim); transition: background .12s ease, color .12s ease; }
+  .seg button + button { border-left: 1px solid var(--hairline-soft); }
+  .seg button.active { background: var(--text); color: var(--bg); }
   .seg button:hover:not(.active) { color: var(--text); }
 </style>
 </head>
@@ -154,16 +242,14 @@
 <a href="#mainContent" class="skip-link">Skip to content</a>
 
 <!-- ============================== LOGIN ============================== -->
-<div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: radial-gradient(circle at 30% 20%, var(--panel-raised) 0%, var(--bg) 60%);">
-  <div class="panel w-full max-w-sm p-9 rise" style="border-radius: 8px; box-shadow: 0 30px 60px -20px rgba(0,0,0,0.4);">
-    <div class="flex items-center gap-3 mb-8">
-      <div class="w-11 h-11 flex items-center justify-center font-display font-bold text-lg" style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--hairline); border-radius: 5px;">C</div>
-      <div>
-        <div class="font-display font-bold text-lg leading-tight">ClouorVR</div>
-        <div class="text-[11px] font-mono tracking-widest" style="color: var(--text-faint);">FIELD CONSOLE</div>
-      </div>
+<div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: var(--bg);">
+  <div class="w-full max-w-sm rise" style="border-top: 2px solid var(--text); padding-top: 28px;">
+    <div class="flex items-center gap-3 mb-10">
+      <img src="Aprena.png" alt="Aprena" class="brand-logo" onerror="this.remove()">
+      <span class="text-[10px] uppercase tracking-widest pl-3" style="color: var(--text-faint); border-left: 1px solid var(--hairline-soft);">LiveOps console</span>
     </div>
-    <p class="text-sm mb-6" style="color: var(--text-dim);">Sign in to reach your live projects.</p>
+    <h1 class="font-display" style="font-size: 52px; line-height: .95; letter-spacing: -.025em; font-weight: 500;">ClouorVR</h1>
+    <p class="text-sm mt-3 mb-8" style="color: var(--text-dim);">The backend behind your VR game's players, economy and live events. Sign in to reach your projects.</p>
 
     <div id="hcapBlock" class="h-captcha mb-4 flex justify-center" data-sitekey="6cca0de8-3dde-409a-b7d8-680a34407aa4" data-callback="unlockLogin"></div>
 
@@ -196,7 +282,7 @@
       <p class="text-[11px] mt-2.5" style="color: var(--text-faint);">Use this if Google/GitHub sign-in isn't working.</p>
     </div>
 
-    <p id="loginErrorText" class="hidden mt-5 text-xs px-3 py-2.5" style="background: var(--danger-soft); color: var(--danger-text); border-radius: 4px;"></p>
+    <p id="loginErrorText" class="hidden mt-5 text-xs px-3 py-2.5" style="background: var(--danger-soft); color: var(--danger-text);"></p>
   </div>
 </div>
 
@@ -205,9 +291,9 @@
 
   <div id="sidebar" class="panel border-r flex flex-col" style="border-color: var(--hairline-soft); border-radius: 0;">
     <div class="p-5 border-b flex items-center gap-3" style="border-color: var(--hairline-soft);">
-      <div class="w-9 h-9 flex items-center justify-center font-display font-bold" style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--hairline); border-radius: 5px;">C</div>
-      <div class="min-w-0 flex-1">
-        <div class="font-display font-bold text-sm leading-tight">ClouorVR</div>
+      <img src="Aprena.png" alt="Aprena" class="brand-logo shrink-0" style="height:22px" onerror="this.remove()">
+      <div class="min-w-0 flex-1 pl-3" style="border-left: 1px solid var(--hairline-soft);">
+        <div class="font-display text-base leading-tight" style="font-weight:500">ClouorVR</div>
         <div id="userDisplayTag" class="text-[10px] font-mono truncate" style="color: var(--text-faint);"></div>
       </div>
       <button onclick="closeMobileSidebar()" class="md:hidden px-2" aria-label="Close menu"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
@@ -221,20 +307,31 @@
       <div id="projectsListContainer" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto pr-1"></div>
     </div>
 
-    <nav class="flex-1 p-4 flex flex-col gap-1 overflow-y-auto" id="mainNav" aria-label="Main">
-      <button onclick="switchTab('overview')" id="btn-overview" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5 active"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span id="lbl-overview">Overview</span></button>
-      <button onclick="switchTab('players')" id="btn-players" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/><circle cx="18" cy="7" r="3"/><path d="M22 21v-2a3.7 3.7 0 0 0-2.5-3.5"/></svg><span id="lbl-players">Players</span></button>
-      <button onclick="switchTab('currencies')" id="btn-currencies" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 2.5-1.5c1.5 0 2.5.8 2.5 2s-1 1.7-2.5 2-2.5.8-2.5 2 1 2 2.5 2a2.5 2.5 0 0 0 2.5-1.5M12 6.5v1M12 16v1"/></svg><span id="lbl-currencies">Currencies</span></button>
-      <button onclick="switchTab('cosmetics')" id="btn-cosmetics" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span id="lbl-cosmetics">Catalog</span></button>
-      <button onclick="switchTab('titledata')" id="btn-titledata" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span id="lbl-titledata">Title Data</span></button>
-      <button onclick="switchTab('activity')" id="btn-activity" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg><span id="lbl-activity">Activity</span></button>
-      <button onclick="switchTab('projectsettings')" id="btn-projectsettings" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span id="lbl-projectsettings">Project</span></button>
-      <button onclick="switchTab('leaderboards')" id="btn-leaderboards" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H3a4 4 0 0 0 4 4M17 6h4a4 4 0 0 1-4 4"/></svg><span id="lbl-leaderboards">Leaderboards</span></button>
-      <button onclick="switchTab('moderation')" id="btn-moderation" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M4 22V4a1 1 0 0 1 1-1h11l-2 4 2 4H5"/></svg><span id="lbl-moderation">Moderation</span><span id="navBadge-moderation" class="nav-badge hidden"></span></button>
-      <button onclick="switchTab('news')" id="btn-news" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></svg><span id="lbl-news">News</span><span id="navBadge-news" class="nav-badge hidden"></span></button>
-      <button onclick="switchTab('codes')" id="btn-codes" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M3 8V5h18v3a3 3 0 0 0 0 6v3H3v-3a3 3 0 0 0 0-6z"/><path d="M13 5v2M13 11v2M13 17v2"/></svg><span id="lbl-codes">Codes</span><span id="navBadge-codes" class="nav-badge hidden"></span></button>
-      <button onclick="switchTab('platform')" id="btn-platform" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition hidden"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 mr-2.5" style="display:inline-block;vertical-align:-3px;"><path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6z"/></svg><span id="lbl-platform">Platform</span></button>
-      <button onclick="switchTab('settings')" id="btn-settings" class="nav-item text-left px-3.5 py-2.5 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/></svg><span id="lbl-settings">Settings</span></button>
+    <nav class="flex-1 px-3 py-4 flex flex-col gap-px overflow-y-auto" id="mainNav" aria-label="Main">
+      <p class="nav-sec">Players</p>
+      <button onclick="switchTab('overview')" id="btn-overview" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5 active"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span id="lbl-overview">Overview</span></button>
+      <button onclick="switchTab('players')" id="btn-players" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/><circle cx="18" cy="7" r="3"/><path d="M22 21v-2a3.7 3.7 0 0 0-2.5-3.5"/></svg><span id="lbl-players">Players</span></button>
+      <button onclick="switchTab('segments')" id="btn-segments" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><circle cx="8" cy="8" r="5"/><circle cx="16" cy="16" r="5"/></svg><span id="lbl-segments">Segments</span></button>
+      <button onclick="switchTab('groups')" id="btn-groups" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg><span id="lbl-groups">Groups</span></button>
+      <button onclick="switchTab('moderation')" id="btn-moderation" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M4 22V4a1 1 0 0 1 1-1h11l-2 4 2 4H5"/></svg><span id="lbl-moderation">Moderation</span><span id="navBadge-moderation" class="nav-badge hidden"></span></button>
+      <p class="nav-sec">Economy</p>
+      <button onclick="switchTab('currencies')" id="btn-currencies" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 2.5-1.5c1.5 0 2.5.8 2.5 2s-1 1.7-2.5 2-2.5.8-2.5 2 1 2 2.5 2a2.5 2.5 0 0 0 2.5-1.5M12 6.5v1M12 16v1"/></svg><span id="lbl-currencies">Currencies</span></button>
+      <button onclick="switchTab('cosmetics')" id="btn-cosmetics" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span id="lbl-cosmetics">Catalog</span></button>
+      <button onclick="switchTab('stores')" id="btn-stores" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M4 9h16l-1.5-5h-13z"/><path d="M5 9v11h14V9"/><path d="M10 20v-5h4v5"/></svg><span id="lbl-stores">Stores &amp; bundles</span></button>
+      <button onclick="switchTab('droptables')" id="btn-droptables" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><rect x="4" y="4" width="16" height="16"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg><span id="lbl-droptables">Drop tables</span></button>
+      <button onclick="switchTab('codes')" id="btn-codes" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M3 8V5h18v3a3 3 0 0 0 0 6v3H3v-3a3 3 0 0 0 0-6z"/><path d="M13 5v2M13 11v2M13 17v2"/></svg><span id="lbl-codes">Codes</span><span id="navBadge-codes" class="nav-badge hidden"></span></button>
+      <p class="nav-sec">Live content</p>
+      <button onclick="switchTab('titledata')" id="btn-titledata" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span id="lbl-titledata">Title Data</span></button>
+      <button onclick="switchTab('news')" id="btn-news" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></svg><span id="lbl-news">News</span><span id="navBadge-news" class="nav-badge hidden"></span></button>
+      <button onclick="switchTab('experiments')" id="btn-experiments" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M9 3h6M10 3v6l-5 10a1 1 0 0 0 1 2h12a1 1 0 0 0 1-2l-5-10V3"/><path d="M7 15h10"/></svg><span id="lbl-experiments">Experiments</span></button>
+      <button onclick="switchTab('automation')" id="btn-automation" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></svg><span id="lbl-automation">Automation</span></button>
+      <p class="nav-sec">Data</p>
+      <button onclick="switchTab('leaderboards')" id="btn-leaderboards" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H3a4 4 0 0 0 4 4M17 6h4a4 4 0 0 1-4 4"/></svg><span id="lbl-leaderboards">Leaderboards</span></button>
+      <button onclick="switchTab('activity')" id="btn-activity" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg><span id="lbl-activity">Activity</span></button>
+      <p class="nav-sec">Admin</p>
+      <button onclick="switchTab('projectsettings')" id="btn-projectsettings" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span id="lbl-projectsettings">Project</span></button>
+      <button onclick="switchTab('platform')" id="btn-platform" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition items-center gap-2.5 hidden"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6z"/></svg><span id="lbl-platform">Platform</span></button>
+      <button onclick="switchTab('settings')" id="btn-settings" class="nav-item text-left px-3.5 py-2 font-semibold text-sm transition flex items-center gap-2.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/></svg><span id="lbl-settings">Settings</span></button>
     </nav>
 
     <div class="p-4 border-t flex items-center gap-2" style="border-color: var(--hairline-soft);">
@@ -250,8 +347,9 @@
       <button onclick="toggleTheme()" class="px-2" aria-label="Toggle theme"><svg id="themeIconMobile" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.5A8.5 8.5 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg></button>
     </div>
 
-    <header class="h-16 border-b hidden md:flex items-center px-8 justify-between shrink-0" style="border-color: var(--hairline-soft);">
-      <h2 id="currentTabTitle" class="font-display font-bold text-xl">Overview</h2>
+    <header class="h-16 border-b hidden md:flex items-center px-8 gap-4 shrink-0" style="border-color: var(--hairline-soft);">
+      <h2 id="currentTabTitle" class="font-display text-2xl" style="font-weight:500">Overview</h2>
+      <span id="headerProjectName" class="text-[10px] uppercase tracking-widest ml-auto" style="color: var(--text-faint);"></span>
     </header>
 
     <main id="mainContent" class="flex-1 overflow-y-auto p-5 md:p-8 relative" tabindex="-1">
@@ -263,26 +361,26 @@
 
       <!-- OVERVIEW -->
       <div id="tab-overview" class="tab-content max-w-4xl mx-auto rise">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
-          <div class="panel p-5 md:p-7">
-            <h3 class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color: var(--text-faint);">Players</h3>
-            <p class="font-display font-bold text-2xl md:text-4xl" id="statPlayers">0</p>
-          </div>
-          <div class="panel p-5 md:p-7">
-            <h3 class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color: var(--text-faint);">Online now</h3>
-            <p class="font-display font-bold text-2xl md:text-4xl" id="statOnline" style="color: var(--moss-text);">0</p>
-          </div>
-          <div class="panel p-5 md:p-7">
-            <h3 class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color: var(--text-faint);">Currencies</h3>
-            <p class="font-display font-bold text-2xl md:text-4xl" id="statCurrencies">0</p>
-          </div>
-          <div class="panel p-5 md:p-7">
-            <h3 class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color: var(--text-faint);">Cosmetics</h3>
-            <p class="font-display font-bold text-2xl md:text-4xl" id="statCosmetics">0</p>
-          </div>
+        <div class="kpi-strip mb-10">
+          <div><div class="lbl">Players</div><div class="num" id="statPlayers">0</div></div>
+          <div><div class="lbl"><span class="live-dot"></span>Online now</div><div class="num" id="statOnline" style="color: var(--moss-text);">0</div></div>
+          <div><div class="lbl">Currencies</div><div class="num" id="statCurrencies">0</div></div>
+          <div><div class="lbl">Cosmetics</div><div class="num" id="statCosmetics">0</div></div>
         </div>
 
-        <h3 class="font-display font-bold text-base mb-3">Project credentials</h3>
+        <h3 class="sec-h"><span class="n">01</span>Last 14 days<span class="aside" id="retentionLine"></span></h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <figure>
+            <figcaption class="text-xs mb-3" style="color: var(--text-dim);">Active players per day <span style="color: var(--text-faint);">(anyone who sent an event or was seen online)</span></figcaption>
+            <div class="chart" id="chartActive"></div>
+          </figure>
+          <figure>
+            <figcaption class="text-xs mb-3" style="color: var(--text-dim);">New players per day</figcaption>
+            <div class="chart" id="chartNew"></div>
+          </figure>
+        </div>
+
+        <h3 class="sec-h"><span class="n">02</span>Project credentials</h3>
         <p class="text-xs mb-4" style="color: var(--text-dim);">Your game calls Supabase directly through the RPC functions in <span class="font-mono">supabase_rls_setup.sql</span>, using this project ID plus your Supabase URL and anon key.</p>
         <div class="keycard p-6 mb-8">
           <div class="flex flex-col gap-4 relative">
@@ -312,7 +410,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 class="font-display font-bold text-base mb-3">Recently joined</h3>
+            <h3 class="sec-h" style="font-size:18px"><span class="n">03</span>Recently joined</h3>
             <div class="panel overflow-hidden">
               <ul id="recentPlayersList" class="divide-y text-sm max-h-64 overflow-y-auto" style="border-color: var(--hairline-soft);">
                 <li class="py-8 text-center text-xs" style="color: var(--text-faint);">No players yet.</li>
@@ -320,7 +418,7 @@
             </div>
           </div>
           <div>
-            <h3 class="font-display font-bold text-base mb-3">Currency in circulation</h3>
+            <h3 class="sec-h" style="font-size:18px"><span class="n">04</span>Currency in circulation</h3>
             <div class="panel overflow-hidden">
               <ul id="overviewCurrencyList" class="divide-y text-sm max-h-64 overflow-y-auto" style="border-color: var(--hairline-soft);">
                 <li class="py-8 text-center text-xs" style="color: var(--text-faint);">No currencies yet.</li>
@@ -574,6 +672,203 @@
         </div>
       </div>
 
+      <!-- SEGMENTS -->
+      <div id="tab-segments" class="tab-content hidden max-w-5xl mx-auto rise">
+        <p class="lede">A segment is a saved filter over your players that stays live: someone who stops playing drops into "lapsed" on their own. Stores, experiments and scheduled tasks can all target one.</p>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-2 panel p-6 h-fit">
+            <h3 class="uppercase text-[10px] tracking-widest mb-5" style="color: var(--text-faint);" id="segFormTitle">New segment</h3>
+            <input type="hidden" id="segEditId">
+            <input id="segName" type="text" maxlength="60" class="w-full p-3 mb-4 input-field text-sm" placeholder="Name, e.g. Lapsed spenders">
+            <p class="text-xs mb-2" style="color: var(--text-dim);">Players who match <b>every</b> rule:</p>
+            <div id="segRules"></div>
+            <button onclick="addSegRule()" class="btn-ghost px-3 py-1.5 text-xs font-semibold mb-5">+ Rule</button>
+            <p id="segPreview" class="text-xs mb-5 font-mono" style="color: var(--text-faint);"></p>
+            <div class="flex gap-2">
+              <button onclick="submitSegment()" class="btn-accent py-3 flex-1 text-sm">Save segment</button>
+              <button onclick="resetSegmentForm()" id="segCancelBtn" class="btn-ghost py-3 px-4 text-sm font-semibold hidden">Cancel</button>
+            </div>
+          </div>
+          <div class="lg:col-span-3" id="segmentsList"></div>
+        </div>
+      </div>
+
+      <!-- GROUPS -->
+      <div id="tab-groups" class="tab-content hidden max-w-5xl mx-auto rise">
+        <p class="lede">Clans, squads, guilds: whatever your game calls them. Players create and join groups from the game with <code>CreateGroup</code> and <code>JoinGroup</code>; you can fix membership here.</p>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-2">
+            <div class="panel p-5 mb-6">
+              <h3 class="uppercase text-[10px] tracking-widest mb-4" style="color: var(--text-faint);">New group</h3>
+              <div class="flex gap-2 mb-2">
+                <input id="grpName" type="text" maxlength="40" class="flex-1 p-2.5 input-field text-sm" placeholder="Group name">
+                <input id="grpTag" type="text" maxlength="5" class="w-20 p-2.5 input-field text-sm font-mono uppercase" placeholder="TAG">
+              </div>
+              <div class="flex gap-2">
+                <select id="grpOwner" class="flex-1 p-2.5 input-field text-xs"></select>
+                <input id="grpMax" type="number" min="2" max="500" value="50" class="w-20 p-2.5 input-field text-xs" title="Max members">
+              </div>
+              <button onclick="submitGroup()" class="btn-accent w-full py-2.5 text-sm mt-3">Create group</button>
+            </div>
+            <div id="groupsList"></div>
+          </div>
+          <div class="lg:col-span-3" id="groupDetail">
+            <p class="text-sm py-10" style="color: var(--text-faint);">Pick a group to see its members.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STORES & BUNDLES -->
+      <div id="tab-stores" class="tab-content hidden max-w-5xl mx-auto rise">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+          <p class="lede" style="margin:0">The catalog sets an item's normal price. A store is a shelf of items with its own prices, for a sale, a VIP shop, or a weekend event. A bundle sells several things as one.</p>
+          <div class="seg" id="storeViewSeg"><button data-v="stores" class="active">Stores</button><button data-v="bundles">Bundles</button></div>
+        </div>
+
+        <div id="storesView" class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-2 panel p-6 h-fit">
+            <h3 class="uppercase text-[10px] tracking-widest mb-5" style="color: var(--text-faint);" id="storeFormTitle">New store</h3>
+            <input type="hidden" id="storeEditId">
+            <div class="flex gap-2 mb-2">
+              <input id="storeKey" type="text" maxlength="40" class="w-2/5 p-2.5 input-field text-sm font-mono" placeholder="store_id">
+              <input id="storeName" type="text" maxlength="60" class="flex-1 p-2.5 input-field text-sm" placeholder="Name, e.g. Halloween sale">
+            </div>
+            <select id="storeSegment" class="w-full p-2.5 mb-2 input-field text-xs"></select>
+            <div class="grid grid-cols-1 gap-2 mb-4">
+              <label class="text-[10px] uppercase tracking-widest" style="color: var(--text-faint);">Opens<input id="storeStarts" type="datetime-local" class="w-full p-2 mt-1 input-field text-xs normal-case tracking-normal"></label>
+              <label class="text-[10px] uppercase tracking-widest" style="color: var(--text-faint);">Closes<input id="storeEnds" type="datetime-local" class="w-full p-2 mt-1 input-field text-xs normal-case tracking-normal"></label>
+            </div>
+            <h4 class="uppercase text-[10px] tracking-widest mb-2" style="color: var(--text-faint);">Items</h4>
+            <div id="storeItemRows"></div>
+            <button onclick="addStoreItemRow()" class="btn-ghost px-3 py-1.5 text-xs font-semibold mb-5">+ Item</button>
+            <label class="flex items-center gap-2 mb-5 text-xs" style="color: var(--text-dim);"><input type="checkbox" id="storeActive" checked> Open for business</label>
+            <div class="flex gap-2">
+              <button onclick="submitStore()" class="btn-accent py-3 flex-1 text-sm">Save store</button>
+              <button onclick="resetStoreForm()" id="storeCancelBtn" class="btn-ghost py-3 px-4 text-sm font-semibold hidden">Cancel</button>
+            </div>
+          </div>
+          <div class="lg:col-span-3" id="storesList"></div>
+        </div>
+
+        <div id="bundlesView" class="hidden grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-2 panel p-6 h-fit">
+            <h3 class="uppercase text-[10px] tracking-widest mb-5" style="color: var(--text-faint);" id="bundleFormTitle">New bundle</h3>
+            <input type="hidden" id="bundleEditId">
+            <div class="flex gap-2 mb-4">
+              <input id="bundleKey" type="text" maxlength="40" class="w-2/5 p-2.5 input-field text-sm font-mono" placeholder="bundle_id">
+              <input id="bundleName" type="text" maxlength="60" class="flex-1 p-2.5 input-field text-sm" placeholder="Name, e.g. Starter pack">
+            </div>
+            <h4 class="uppercase text-[10px] tracking-widest mb-2" style="color: var(--text-faint);">Contains</h4>
+            <select id="bundleCosmetics" multiple class="w-full p-2 input-field text-xs mb-1 h-24"></select>
+            <p class="text-[10px] mb-3" style="color: var(--text-faint);">Ctrl/Cmd-click for several cosmetics.</p>
+            <div id="bundleCurrencyInputs" class="flex flex-col gap-2 mb-4"></div>
+            <h4 class="uppercase text-[10px] tracking-widest mb-2" style="color: var(--text-faint);">Costs</h4>
+            <div class="flex gap-2 mb-6">
+              <input id="bundlePrice" type="number" min="0" class="w-28 p-2.5 input-field text-sm" placeholder="Price">
+              <select id="bundleCurrency" class="flex-1 p-2.5 input-field text-xs"></select>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="submitBundle()" class="btn-accent py-3 flex-1 text-sm">Save bundle</button>
+              <button onclick="resetBundleForm()" id="bundleCancelBtn" class="btn-ghost py-3 px-4 text-sm font-semibold hidden">Cancel</button>
+            </div>
+          </div>
+          <div class="lg:col-span-3" id="bundlesList"></div>
+        </div>
+      </div>
+
+      <!-- DROP TABLES -->
+      <div id="tab-droptables" class="tab-content hidden max-w-5xl mx-auto rise">
+        <p class="lede">Loot boxes, daily chests, end-of-round rewards. Each line has a weight; its chance is its weight divided by the total. A line can point at another table, so a "rare" roll can open a whole second table. Your game rolls with <code>RollDropTable</code>, and the server picks, so players can't reroll on their side.</p>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-2 panel p-6 h-fit">
+            <h3 class="uppercase text-[10px] tracking-widest mb-5" style="color: var(--text-faint);" id="dtFormTitle">New drop table</h3>
+            <input type="hidden" id="dtEditId">
+            <div class="flex gap-2 mb-4">
+              <input id="dtKey" type="text" maxlength="40" class="w-2/5 p-2.5 input-field text-sm font-mono" placeholder="table_id">
+              <input id="dtName" type="text" maxlength="60" class="flex-1 p-2.5 input-field text-sm" placeholder="Name, e.g. Daily chest">
+            </div>
+            <div id="dtRows"></div>
+            <button onclick="addDropRow()" class="btn-ghost px-3 py-1.5 text-xs font-semibold mb-5">+ Outcome</button>
+            <div class="flex gap-2">
+              <button onclick="submitDropTable()" class="btn-accent py-3 flex-1 text-sm">Save table</button>
+              <button onclick="resetDropForm()" id="dtCancelBtn" class="btn-ghost py-3 px-4 text-sm font-semibold hidden">Cancel</button>
+            </div>
+          </div>
+          <div class="lg:col-span-3" id="dropTablesList"></div>
+        </div>
+      </div>
+
+      <!-- EXPERIMENTS -->
+      <div id="tab-experiments" class="tab-content hidden max-w-5xl mx-auto rise">
+        <p class="lede">Try two versions of something on real players before shipping it to everyone. Each variant overrides some Title Data keys; a player keeps the same variant for the whole test. Pick the event that means "it worked" and the console counts it per variant.</p>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-2 panel p-6 h-fit">
+            <h3 class="uppercase text-[10px] tracking-widest mb-5" style="color: var(--text-faint);" id="expFormTitle">New experiment</h3>
+            <input type="hidden" id="expEditId">
+            <input id="expName" type="text" maxlength="60" class="w-full p-2.5 mb-2 input-field text-sm" placeholder="Name, e.g. Cheaper first hat">
+            <textarea id="expDesc" rows="2" maxlength="400" class="w-full p-2.5 mb-2 input-field text-sm" placeholder="What you expect to happen, and why"></textarea>
+            <select id="expSegment" class="w-full p-2.5 mb-2 input-field text-xs"></select>
+            <input id="expMetric" type="text" maxlength="64" list="knownEvents" class="w-full p-2.5 mb-4 input-field text-sm font-mono" placeholder="Success event, e.g. purchase">
+            <h4 class="uppercase text-[10px] tracking-widest mb-2" style="color: var(--text-faint);">Variants</h4>
+            <div id="expVariants"></div>
+            <button onclick="addVariantRow()" class="btn-ghost px-3 py-1.5 text-xs font-semibold mb-5">+ Variant</button>
+            <div class="flex gap-2">
+              <button onclick="submitExperiment()" class="btn-accent py-3 flex-1 text-sm">Save as draft</button>
+              <button onclick="resetExperimentForm()" id="expCancelBtn" class="btn-ghost py-3 px-4 text-sm font-semibold hidden">Cancel</button>
+            </div>
+          </div>
+          <div class="lg:col-span-3" id="experimentsList"></div>
+        </div>
+      </div>
+
+      <!-- AUTOMATION -->
+      <div id="tab-automation" class="tab-content hidden max-w-5xl mx-auto rise">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+          <p class="lede" style="margin:0">Things the server does without you: hand out a weekend bonus, publish a patch note at 18:00, close a season on Sunday night. Webhooks tell your own server the moment something happens in-game.</p>
+          <div class="seg" id="autoViewSeg"><button data-v="tasks" class="active">Scheduled tasks</button><button data-v="hooks">Webhooks</button></div>
+        </div>
+
+        <div id="tasksView" class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-2 panel p-6 h-fit">
+            <h3 class="uppercase text-[10px] tracking-widest mb-5" style="color: var(--text-faint);">New scheduled task</h3>
+            <input id="taskName" type="text" maxlength="60" class="w-full p-2.5 mb-2 input-field text-sm" placeholder="Name, e.g. Weekend coin drop">
+            <select id="taskAction" class="w-full p-2.5 mb-2 input-field text-sm">
+              <option value="grant_currency">Give currency</option>
+              <option value="add_tag">Add a tag</option>
+              <option value="set_title_data">Set a Title Data key</option>
+              <option value="publish_news">Publish a news draft</option>
+              <option value="reset_statistic">End a leaderboard season</option>
+            </select>
+            <div id="taskParams" class="mb-2"></div>
+            <select id="taskSegment" class="w-full p-2.5 mb-4 input-field text-xs"></select>
+            <h4 class="uppercase text-[10px] tracking-widest mb-2" style="color: var(--text-faint);">When</h4>
+            <div class="seg mb-3" id="taskKindSeg"><button data-v="once" class="active">Once</button><button data-v="daily">Daily</button><button data-v="weekly">Weekly</button></div>
+            <div class="flex gap-2 mb-2">
+              <input id="taskRunAt" type="datetime-local" class="flex-1 p-2.5 input-field text-xs">
+              <select id="taskWeekday" class="hidden p-2.5 input-field text-xs">
+                <option value="1">Mon</option><option value="2">Tue</option><option value="3">Wed</option><option value="4">Thu</option><option value="5">Fri</option><option value="6">Sat</option><option value="0">Sun</option>
+              </select>
+              <input id="taskTime" type="time" value="18:00" class="hidden p-2.5 input-field text-xs">
+            </div>
+            <p class="text-[11px] mb-5" style="color: var(--text-faint);">Times are in your timezone. The server checks for due tasks once a minute.</p>
+            <button onclick="submitTask()" class="btn-accent w-full py-3 text-sm">Schedule it</button>
+          </div>
+          <div class="lg:col-span-3" id="tasksList"></div>
+        </div>
+
+        <div id="hooksView" class="hidden grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-2 panel p-6 h-fit">
+            <h3 class="uppercase text-[10px] tracking-widest mb-5" style="color: var(--text-faint);">New webhook</h3>
+            <input id="hookEvent" type="text" maxlength="64" list="knownEvents" class="w-full p-2.5 mb-2 input-field text-sm font-mono" placeholder="Event name, or * for every event">
+            <input id="hookUrl" type="url" class="w-full p-2.5 mb-4 input-field text-sm font-mono" placeholder="https://your-server.example/hooks/clouorvr">
+            <p class="text-[11px] mb-5" style="color: var(--text-faint);">Each call is a JSON <span class="font-mono">POST</span> signed with a secret shown once after saving. Built-in events: <span class="font-mono">purchase</span>, <span class="font-mono">drop_rolled</span>, <span class="font-mono">group_joined</span>, <span class="font-mono">webhook_test</span>.</p>
+            <button onclick="submitWebhook()" class="btn-accent w-full py-3 text-sm">Add webhook</button>
+          </div>
+          <div class="lg:col-span-3" id="hooksList"></div>
+        </div>
+        <datalist id="knownEvents"><option value="purchase"><option value="drop_rolled"><option value="group_joined"><option value="webhook_test"></datalist>
+      </div>
+
       <!-- PROJECT SETTINGS -->
       <div id="tab-projectsettings" class="tab-content hidden max-w-3xl mx-auto rise">
         <h1 class="font-display font-bold text-2xl mb-7">Project settings</h1>
@@ -598,10 +893,10 @@
             </div>
           </div>
         </div>
-        <div class="p-6 md:p-8 mt-6" style="background: var(--danger-soft); border: 1px solid var(--hairline); border-radius: 6px;">
+        <div class="p-6 md:p-8 mt-6" style="background: var(--danger-soft); border: 1px solid var(--hairline);">
           <h3 class="font-bold text-sm mb-1.5" style="color: var(--danger-text);">Delete this project</h3>
           <p class="text-xs mb-5" style="color: var(--text-dim);">Removes the project and its credentials.</p>
-          <button onclick="deleteCurrentProject()" class="font-bold py-2.5 px-6 text-xs" style="background: var(--danger); color: #1a0a06; border-radius: 4px;">Delete project</button>
+          <button onclick="deleteCurrentProject()" class="btn-danger py-2.5 px-6 text-xs">Delete project</button>
         </div>
       </div>
 
@@ -613,7 +908,7 @@
           <h3 class="font-bold text-sm mb-1.5">Block an account</h3>
           <div class="flex flex-col sm:flex-row gap-3 mt-4">
             <input id="newBannedEmail" type="email" class="flex-1 p-3 input-field text-sm" placeholder="account@email.com">
-            <button onclick="banAccount()" class="font-bold px-7 py-3 sm:py-0 text-sm" style="background: var(--danger); color: #1a0a06; border-radius: 4px;">Block</button>
+            <button onclick="banAccount()" class="btn-danger px-7 py-3 sm:py-0 text-sm">Block</button>
           </div>
         </div>
         <div class="panel overflow-hidden">
@@ -667,7 +962,7 @@
 </div>
 
 <div id="createProjectModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: var(--backdrop);" role="dialog" aria-modal="true">
-  <div class="panel w-full max-w-sm p-7 rise" style="border-radius: 8px;">
+  <div class="panel w-full max-w-sm p-7 rise" >
     <h3 class="font-display font-bold text-lg mb-5">New project</h3>
     <input id="newProjName" type="text" class="w-full p-3 mb-6 input-field text-sm" placeholder="Project name">
     <div class="flex gap-3">
@@ -678,9 +973,9 @@
 </div>
 
 <div id="apiKeyRevealModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: var(--backdrop);" role="dialog" aria-modal="true">
-  <div class="panel w-full max-w-md p-7 rise" style="border-radius: 8px;">
-    <h3 class="font-display font-bold text-lg mb-2">Your new Game API key</h3>
-    <p class="text-xs mb-5" style="color: var(--danger-text);">This is the only time it will be shown. Copy it now and paste it into your game's MirrorVRManager - you won't be able to view it again.</p>
+  <div class="panel w-full max-w-md p-7 rise" >
+    <h3 class="font-display font-bold text-lg mb-2" id="revealTitle">Your new Game API key</h3>
+    <p class="text-xs mb-5" style="color: var(--danger-text);" id="revealDesc">This is the only time it will be shown. Copy it now and paste it into your game's MirrorVRManager - you won't be able to view it again.</p>
     <div class="flex gap-2 mb-6">
       <input id="apiKeyRevealInput" type="text" readonly class="flex-1 p-3 text-sm font-mono input-field" style="color: var(--accent-text);">
       <button onclick="copyToClipboard('apiKeyRevealInput')" class="btn-ghost px-4 text-xs font-bold">Copy</button>
@@ -690,19 +985,19 @@
 </div>
 
 <div id="provisionModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: var(--backdrop);" role="dialog" aria-modal="true">
-  <div class="panel w-full max-w-sm p-7 rise" style="border-radius: 8px;">
+  <div class="panel w-full max-w-sm p-7 rise" >
     <h3 class="font-display font-bold text-lg mb-5">Add a player manually</h3>
     <input id="provPlayerId" type="text" class="w-full p-3 mb-3 input-field text-sm font-mono" placeholder="Player ID">
     <input id="provPlayerName" type="text" class="w-full p-3 mb-6 input-field text-sm" placeholder="Display name (optional)">
     <div class="flex gap-3">
-      <button onclick="executeProvision()" class="flex-1 font-bold py-3 text-sm" style="background: var(--moss); color: #0c1410; border-radius: 3px;">Add player</button>
+      <button onclick="executeProvision()" class="flex-1 btn-accent py-3 text-sm">Add player</button>
       <button onclick="closeModal('provisionModal')" class="btn-ghost px-6 text-sm font-bold">Cancel</button>
     </div>
   </div>
 </div>
 
 <div id="currencyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: var(--backdrop);" role="dialog" aria-modal="true">
-  <div class="panel w-full max-w-md p-7 rise my-8" style="border-radius: 8px;">
+  <div class="panel w-full max-w-md p-7 rise my-8" >
     <h3 class="font-display font-bold text-lg mb-5" id="currencyModalTitle">New currency</h3>
     <input type="hidden" id="curEditId">
     <input id="curName" type="text" class="w-full p-3 mb-3 input-field text-sm" placeholder="Name (e.g. Coins)">
@@ -719,7 +1014,7 @@
 </div>
 
 <div id="rolesModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: var(--backdrop);" role="dialog" aria-modal="true">
-  <div class="panel w-full max-w-md p-7 rise my-8" style="border-radius: 8px;">
+  <div class="panel w-full max-w-md p-7 rise my-8" >
     <h3 class="font-display font-bold text-lg mb-2">Manage roles</h3>
     <p class="text-xs mb-5" style="color: var(--text-dim);">Roles are custom per project - add, reorder by rank, or remove them here.</p>
     <div id="rolesModalList" class="flex flex-col gap-2 mb-5 max-h-64 overflow-y-auto"></div>
@@ -729,7 +1024,7 @@
       <input id="roleName" type="text" class="w-full p-2.5 mb-2.5 input-field text-sm" placeholder="Role name (e.g. VIP, Beta Tester)">
       <div class="flex gap-2.5 mb-2.5">
         <input id="roleRank" type="number" class="w-full p-2.5 input-field text-sm" placeholder="Rank (higher = more access)" value="0">
-        <input id="roleColor" type="color" class="w-14 p-1 input-field" value="#c45884" title="Badge color">
+        <input id="roleColor" type="color" class="w-14 p-1 input-field" value="#a2381f" title="Badge color">
       </div>
       <label class="flex items-center gap-2 text-xs font-semibold mb-3" style="color: var(--text-dim);">
         <input type="checkbox" id="roleIsDefault"> Default role for new players
@@ -954,7 +1249,7 @@ function renderProjectsSidebar() {
     const isSel = activeProject && activeProject.id === p.id;
     const btn = document.createElement("button");
     btn.className = "w-full text-left p-2.5 flex items-center gap-2.5 text-xs font-bold transition";
-    btn.style.cssText = isSel ? "background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--hairline); border-radius: 4px;" : "color: var(--text-dim); border: 1px solid transparent; border-radius: 4px;";
+    btn.style.cssText = isSel ? "background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--hairline);" : "color: var(--text-dim); border: 1px solid transparent;";
     btn.onclick = () => { selectProject(p); closeMobileSidebar(); };
     btn.innerHTML = `<span class="truncate">${escapeHtml(p.name)}</span>`;
     cont.appendChild(btn);
@@ -973,6 +1268,8 @@ function selectProject(proj) {
   document.getElementById("serverKeyNotGenerated").classList.toggle("hidden", hasServerKey);
   document.getElementById("serverKeyGenerated").classList.toggle("hidden", !hasServerKey);
   document.getElementById("projSettingNameInput").value = proj.name;
+  document.getElementById("headerProjectName").innerText = proj.name;
+  segmentsArray = []; statsByPlayer = null; openGroupId = null; openSegmentId = null;
   switchTab("overview");
   fetchProjectData();
   loadAuditLog();
@@ -1027,6 +1324,12 @@ async function generateServerKey() {
 function acknowledgeApiKeyReveal() {
   closeModal("apiKeyRevealModal");
   document.getElementById("apiKeyRevealInput").value = "";
+  if (pendingRevealTarget === "webhook") {
+    document.getElementById("revealTitle").innerText = "Your new Game API key";
+    document.getElementById("revealDesc").innerText = "This is the only time it will be shown. Copy it now and paste it into your game's MirrorVRManager. You won't be able to view it again.";
+    pendingRevealTarget = null;
+    return;
+  }
   if (pendingRevealTarget === "server") {
     document.getElementById("serverKeyNotGenerated").classList.add("hidden");
     document.getElementById("serverKeyGenerated").classList.remove("hidden");
@@ -1053,7 +1356,7 @@ async function deleteCurrentProject() {
 function switchTab(tabId) {
   document.querySelectorAll(".tab-content").forEach((el) => el.classList.add("hidden"));
   document.getElementById(`tab-${tabId}`).classList.remove("hidden");
-  const titles = { overview: "Overview", players: "Players", currencies: "Currencies", cosmetics: "Catalog", titledata: "Title Data", activity: "Activity", leaderboards: "Leaderboards", projectsettings: "Project settings", platform: "Platform", settings: "Settings", moderation: "Moderation", news: "News", codes: "Codes" };
+  const titles = { overview: "Overview", players: "Players", currencies: "Currencies", cosmetics: "Catalog", titledata: "Title Data", activity: "Activity", leaderboards: "Leaderboards", projectsettings: "Project settings", platform: "Platform", settings: "Settings", moderation: "Moderation", news: "News", codes: "Codes", segments: "Segments", groups: "Groups", stores: "Stores & bundles", droptables: "Drop tables", experiments: "Experiments", automation: "Automation" };
   document.getElementById("currentTabTitle").innerText = titles[tabId];
   document.getElementById("mobileTabTitle").innerText = titles[tabId];
   document.querySelectorAll("#mainNav button").forEach((b) => b.classList.remove("active"));
@@ -1065,6 +1368,14 @@ function switchTab(tabId) {
   if (tabId === "moderation") loadReports();
   if (tabId === "news") loadNews();
   if (tabId === "codes") { renderCodeGrantInputs(); loadCodes(); }
+  if (activeProject) {
+    if (tabId === "segments") loadSegmentsTab();
+    if (tabId === "groups") loadGroups();
+    if (tabId === "stores") loadStoresTab();
+    if (tabId === "droptables") loadDropTables();
+    if (tabId === "experiments") loadExperiments();
+    if (tabId === "automation") { loadTasks(); loadWebhooks(); }
+  }
   document.getElementById("mainContent").focus();
 }
 
@@ -1104,6 +1415,7 @@ async function fetchProjectData() {
   renderRecentPlayers();
   renderOverviewCurrencyList();
   refreshReportBadge();
+  loadOverviewCharts();
   if (selectedPlayer) openPlayerDrawer(selectedPlayer.id, true);
 }
 
@@ -1153,7 +1465,7 @@ function renderRolesModalList() {
     ? rolesArray.map((r) => `
       <div class="panel p-3 flex items-center justify-between gap-2">
         <span class="flex items-center gap-2 min-w-0">
-          <span class="w-3 h-3 rounded-full shrink-0" style="background:${escapeHtml(r.color || "#c45884")};"></span>
+          <span class="w-3 h-3 rounded-full shrink-0" style="background:${escapeHtml(r.color || "#a2381f")};"></span>
           <span class="font-semibold text-sm truncate">${escapeHtml(r.name)}</span>
           <span class="text-[10px] font-mono px-1.5 py-0.5 panel-raised shrink-0" style="color: var(--text-faint);">rank ${r.rank}</span>
           ${r.is_default ? `<span class="text-[9px] font-bold uppercase shrink-0" style="color: var(--moss-text);">default</span>` : ""}
@@ -1493,7 +1805,7 @@ function renderCurrencies() {
     card.innerHTML = `
       <div class="flex items-start justify-between mb-3">
         <div class="flex items-center gap-2.5">
-          <span class="w-8 h-8 flex items-center justify-center text-sm font-display font-bold shrink-0" style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--hairline); border-radius: 5px;">${escapeHtml((c.name || "?").charAt(0).toUpperCase())}</span>
+          <span class="w-8 h-8 flex items-center justify-center text-sm font-display font-bold shrink-0" style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--hairline);">${escapeHtml((c.name || "?").charAt(0).toUpperCase())}</span>
           <div>
             <div class="font-display font-bold text-sm">${escapeHtml(c.name)}</div>
             ${c.is_premium ? `<span class="text-[9px] font-bold uppercase tracking-wide" style="color: var(--accent-text);">Premium</span>` : ""}
@@ -1566,7 +1878,7 @@ function renderCosmetics() {
   globalCatalog.forEach((c) => {
     const li = document.createElement("li");
     li.className = "py-3.5 px-4 flex justify-between items-center hover:bg-black/5 transition gap-2";
-    li.innerHTML = `<span class="font-semibold text-sm truncate" style="color: var(--accent-text);">${escapeHtml(c.name)} <span class="text-[9px] ml-2 uppercase px-1.5 py-0.5" style="color: var(--text-faint); border: 1px solid var(--hairline-soft); border-radius: 3px;">${escapeHtml(c.slot)}</span> <span class="font-mono text-[10px]" style="color: var(--text-dim);">${c.price} ${escapeHtml(currencyName(c.currency_id))}</span></span>
+    li.innerHTML = `<span class="font-semibold text-sm truncate" style="color: var(--accent-text);">${escapeHtml(c.name)} <span class="text-[9px] ml-2 uppercase px-1.5 py-0.5" style="color: var(--text-faint); border: 1px solid var(--hairline-soft);">${escapeHtml(c.slot)}</span> <span class="font-mono text-[10px]" style="color: var(--text-dim);">${c.price} ${escapeHtml(currencyName(c.currency_id))}</span></span>
       <span class="flex gap-2 shrink-0">
         <button class="edit-btn text-[10px] font-black uppercase">Edit</button>
         <button class="del-btn text-[10px] font-black uppercase" style="color: var(--danger-text);">Delete</button>
@@ -1633,7 +1945,7 @@ async function loadTitleData() {
     li.className = "py-3.5 px-4 flex justify-between items-start hover:bg-black/5 transition gap-2";
     li.innerHTML = `<span class="min-w-0">
         <span class="font-semibold text-sm" style="color: var(--accent-text);">${escapeHtml(r.key)}</span>
-        ${r.is_internal ? `<span class="text-[9px] ml-2 uppercase px-1.5 py-0.5" style="color: var(--text-faint); border: 1px solid var(--hairline-soft); border-radius: 3px;">internal</span>` : ""}
+        ${r.is_internal ? `<span class="text-[9px] ml-2 uppercase px-1.5 py-0.5" style="color: var(--text-faint); border: 1px solid var(--hairline-soft);">internal</span>` : ""}
         <div class="font-mono text-[11px] truncate" style="color: var(--text-dim); max-width: 32rem;">${escapeHtml(r.value ?? "")}</div>
       </span>
       <span class="flex gap-2 shrink-0">
@@ -1722,7 +2034,7 @@ async function loadLeaderboardStatChips() {
   const names = [...new Set((data || []).map((s) => s.stat_name))];
   const chips = document.getElementById("leaderboardStatChips");
   chips.innerHTML = names.length
-    ? names.map((n) => `<button class="stat-chip btn-ghost px-3 py-1.5 rounded-full text-xs font-bold" data-name="${escapeHtml(n)}">${escapeHtml(n)}</button>`).join("")
+    ? names.map((n) => `<button class="stat-chip btn-ghost px-3 py-1.5 font-mono text-xs font-bold" data-name="${escapeHtml(n)}">${escapeHtml(n)}</button>`).join("")
     : `<span class="text-xs italic" style="color: var(--text-faint);">No stats reported yet - call SubmitStatistic from your game first.</span>`;
   chips.querySelectorAll(".stat-chip").forEach((btn) => {
     btn.onclick = () => { document.getElementById("leaderboardStatInput").value = btn.dataset.name; loadLeaderboard(); };
@@ -2076,6 +2388,990 @@ async function resetSeasonNow() {
   await logAudit("reset_statistic", { stat: currentStatDef.stat_name, archived: data });
   showToast(`Season closed - ${data} scores archived.`);
   loadLeaderboard();
+}
+
+
+// =========================================================================
+// LIVEOPS v2 - segments, groups, stores & bundles, drop tables,
+// experiments, automation, overview analytics.
+// Requires clouorvr_liveops_v2.sql.
+// =========================================================================
+let segmentsArray = [];
+let statsByPlayer = null;      // { playerId: { stat: value } }, loaded on demand
+let bundlesArray = [];
+let dropTablesArray = [];
+
+const curName = (id) => (currenciesArray.find((c) => c.id === id) || {}).name || "?";
+const cosName = (id) => (globalCatalog.find((c) => c.id === id) || {}).name || id;
+const segName = (id) => (segmentsArray.find((s) => s.id === id) || {}).name || "a deleted segment";
+const optCurrencies = (sel, blank) => (blank ? `<option value="">${blank}</option>` : "") + currenciesArray.map((c) => `<option value="${c.id}" ${c.id === sel ? "selected" : ""}>${escapeHtml(c.name)}</option>`).join("");
+const optCosmetics = (sel) => globalCatalog.map((c) => `<option value="${escapeHtml(c.id)}" ${c.id === sel ? "selected" : ""}>${escapeHtml(c.name)}</option>`).join("");
+const optSegments = (sel, blank) => `<option value="">${blank}</option>` + segmentsArray.map((s) => `<option value="${s.id}" ${s.id === sel ? "selected" : ""}>${escapeHtml(s.name)}</option>`).join("");
+const emptyNote = (msg) => `<p class="py-10 text-sm" style="color: var(--text-faint);">${msg}</p>`;
+const slug = (v) => v.trim().toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_|_$/g, "").slice(0, 40);
+const toLocalInput = (ts) => { if (!ts) return ""; const d = new Date(ts); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
+const fromLocalInput = (v) => (v ? new Date(v).toISOString() : null);
+function migrationMissing(error) {
+  if (error && /relation .* does not exist|schema cache|Could not find/i.test(error.message || "")) {
+    showToast("Run clouorvr_liveops_v2.sql in Supabase first.", true);
+    return true;
+  }
+  return false;
+}
+function wireSeg(segId, onPick) {
+  document.querySelectorAll(`#${segId} button`).forEach((b) => {
+    b.onclick = () => {
+      document.querySelectorAll(`#${segId} button`).forEach((x) => x.classList.toggle("active", x === b));
+      onPick(b.dataset.v);
+    };
+  });
+}
+
+// ---- Overview analytics --------------------------------------------------
+function dayKey(d) { const x = new Date(d); return `${x.getFullYear()}-${x.getMonth() + 1}-${x.getDate()}`; }
+async function loadOverviewCharts() {
+  if (!activeProject) return;
+  const days = [];
+  const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 13);
+  for (let i = 0; i < 14; i++) { const d = new Date(start); d.setDate(start.getDate() + i); days.push(d); }
+  const newBy = {}, activeBy = {};
+  days.forEach((d) => { newBy[dayKey(d)] = 0; activeBy[dayKey(d)] = new Set(); });
+
+  fullPlayerCache.forEach((p) => {
+    if (p.created_at && newBy[dayKey(p.created_at)] !== undefined) newBy[dayKey(p.created_at)]++;
+    if (p.last_seen && activeBy[dayKey(p.last_seen)]) activeBy[dayKey(p.last_seen)].add(p.id);
+  });
+  const { data: ev } = await client.from("player_events").select("player_id, ts")
+    .eq("project_id", activeProject.id).gte("ts", start.toISOString()).not("player_id", "is", null).limit(20000);
+  const seenOn = {}; // playerId -> Set(dayKey)
+  (ev || []).forEach((e) => {
+    const k = dayKey(e.ts);
+    if (activeBy[k]) activeBy[k].add(e.player_id);
+    (seenOn[e.player_id] = seenOn[e.player_id] || new Set()).add(k);
+  });
+
+  const fmt = (d) => d.toLocaleDateString([], { month: "short", day: "numeric" });
+  renderBars("chartActive", days.map((d) => ({ label: fmt(d), value: activeBy[dayKey(d)].size })), "active");
+  renderBars("chartNew", days.map((d) => ({ label: fmt(d), value: newBy[dayKey(d)] })), "new");
+
+  // Day-1 retention: of players who joined on days 1-13 of the window,
+  // how many sent anything the next calendar day.
+  let cohort = 0, back = 0;
+  fullPlayerCache.forEach((p) => {
+    if (!p.created_at) return;
+    const c = new Date(p.created_at); c.setHours(0, 0, 0, 0);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    if (c < start || c >= today) return;
+    cohort++;
+    const next = new Date(c); next.setDate(c.getDate() + 1);
+    if (seenOn[p.id] && seenOn[p.id].has(dayKey(next))) back++;
+  });
+  document.getElementById("retentionLine").innerText = cohort >= 5
+    ? `Day-1 retention ${Math.round((back / cohort) * 100)}% (${back} of ${cohort} new players came back the next day)`
+    : "Day-1 retention shows up once 5 players have joined";
+}
+function renderBars(elId, pts, unit) {
+  const el = document.getElementById(elId);
+  const max = Math.max(...pts.map((p) => p.value));
+  if (!max) { el.innerHTML = `<div class="flex items-end" style="height:118px; border-bottom:1px solid var(--text);"><p class="text-xs pb-3" style="color: var(--text-faint);">Nothing recorded in the last 14 days.</p></div>`; return; }
+  const W = 560, H = 150, L = 30, B = 22, T = 8;
+  const plotH = H - B - T, step = (W - L) / pts.length, bw = step - 3;
+  const niceMax = max <= 4 ? max : Math.ceil(max / 2) * 2;
+  const y = (v) => T + plotH - (v / niceMax) * plotH;
+  let g = `<line class="grid" x1="${L}" x2="${W}" y1="${y(niceMax)}" y2="${y(niceMax)}"/>`;
+  if (niceMax > 1) g += `<line class="grid" x1="${L}" x2="${W}" y1="${y(niceMax / 2)}" y2="${y(niceMax / 2)}"/>`;
+  g += `<text class="axis" x="${L - 6}" y="${y(niceMax) + 3}" text-anchor="end">${niceMax}</text>`;
+  if (niceMax > 1) g += `<text class="axis" x="${L - 6}" y="${y(niceMax / 2) + 3}" text-anchor="end">${niceMax / 2}</text>`;
+  let hits = "";
+  pts.forEach((p, i) => {
+    const x = L + i * step + 1.5, top = y(p.value);
+    g += `<rect class="bar" data-i="${i}" x="${x}" y="${top}" width="${bw}" height="${Math.max(0, T + plotH - top)}"/>`;
+    hits += `<rect class="hit" data-i="${i}" x="${L + i * step}" y="${T}" width="${step}" height="${plotH}" fill="transparent"/>`;
+    if (i === 0 || i === pts.length - 1 || i === 7) g += `<text class="axis" x="${x + bw / 2}" y="${H - 6}" text-anchor="middle">${p.label}</text>`;
+  });
+  g += `<line class="base" x1="${L}" x2="${W}" y1="${T + plotH}" y2="${T + plotH}"/>` + hits;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${pts.map((p) => p.label + ": " + p.value).join(", ")}">${g}</svg><div class="chart-tip"></div>`;
+  const tip = el.querySelector(".chart-tip");
+  el.querySelectorAll(".hit").forEach((h) => {
+    h.onmouseenter = () => {
+      const i = +h.dataset.i, p = pts[i];
+      tip.innerHTML = `${p.label}<br><b>${p.value}</b> ${unit} player${p.value === 1 ? "" : "s"}`;
+      tip.style.left = ((L + (i + 0.5) * step) / W) * 100 + "%";
+      tip.style.top = (y(p.value) / H) * 100 + "%";
+      tip.style.display = "block";
+      el.querySelectorAll(".bar").forEach((b) => b.classList.toggle("on", b.dataset.i === h.dataset.i));
+    };
+    h.onmouseleave = () => { tip.style.display = "none"; el.querySelectorAll(".bar.on").forEach((b) => b.classList.remove("on")); };
+  });
+}
+
+// ---- Segments -------------------------------------------------------------
+const SEG_FIELDS = {
+  tag:            { label: "Tag",               ops: ["has", "lacks"], val: "text" },
+  role:           { label: "Role",              ops: ["is", "is not"], val: "role" },
+  banned:         { label: "Banned",            ops: ["is"],           val: "bool" },
+  last_seen_days: { label: "Last seen, days ago", ops: [">=", "<="],   val: "number" },
+  created_days:   { label: "Joined, days ago",  ops: ["<=", ">="],     val: "number" },
+  balance:        { label: "Balance of",        ops: [">=", "<="],     val: "number", key: "currency" },
+  stat:           { label: "Statistic",         ops: [">=", "<="],     val: "number", key: "stat" },
+  cosmetic:       { label: "Owns cosmetic",     ops: ["has", "lacks"], val: "cosmetic" },
+};
+async function ensureSegments(force) {
+  if (segmentsArray.length && !force) return;
+  const { data, error } = await client.from("player_segments").select("*").eq("project_id", activeProject.id).order("created_at");
+  if (error) { migrationMissing(error); segmentsArray = []; return; }
+  segmentsArray = data || [];
+}
+async function ensureStats(force) {
+  if (statsByPlayer && !force) return;
+  statsByPlayer = {};
+  const { data } = await client.from("player_statistics").select("player_id, stat_name, value, players!inner(project_id)").eq("players.project_id", activeProject.id).limit(50000);
+  (data || []).forEach((r) => { (statsByPlayer[r.player_id] = statsByPlayer[r.player_id] || {})[r.stat_name] = Number(r.value); });
+}
+function cmp(a, op, b) { return op === ">=" ? a >= b : a <= b; }
+// Keep in step with segment_member_ids() in clouorvr_liveops_v2.sql.
+function playerMatchesRule(p, r) {
+  const now = Date.now(), v = r.value;
+  switch (r.field) {
+    case "tag": { const has = (p.tags || []).includes(v); return r.op === "has" ? has : !has; }
+    case "role": { const is = (p.role || "user") === v; return r.op === "is" ? is : !is; }
+    case "banned": return !!p.is_banned === (v === "true");
+    case "last_seen_days": return cmp(p.last_seen ? (now - new Date(p.last_seen)) / 864e5 : 1e9, r.op, Number(v));
+    case "created_days": return cmp(p.created_at ? (now - new Date(p.created_at)) / 864e5 : 1e9, r.op, Number(v));
+    case "balance": return cmp((p.balances || {})[r.key] || 0, r.op, Number(v));
+    case "stat": return cmp(((statsByPlayer || {})[p.id] || {})[r.key] || 0, r.op, Number(v));
+    case "cosmetic": { const has = p.ownedCosmeticIds && p.ownedCosmeticIds.has(v); return r.op === "has" ? has : !has; }
+  }
+  return false;
+}
+const segmentMembers = (rules) => fullPlayerCache.filter((p) => (rules || []).every((r) => playerMatchesRule(p, r)));
+function describeRule(r) {
+  const f = SEG_FIELDS[r.field] || { label: r.field };
+  const key = r.field === "balance" ? curName(r.key) : r.field === "stat" ? r.key : "";
+  const val = r.field === "cosmetic" ? cosName(r.value) : r.field === "banned" ? (r.value === "true" ? "yes" : "no") : r.value;
+  return `${f.label}${key ? " " + key : ""} ${r.op} ${val}`;
+}
+
+function ruleRowHtml(r) {
+  const f = SEG_FIELDS[r.field];
+  const fieldSel = `<select class="rf input-field p-2 text-xs">${Object.entries(SEG_FIELDS).map(([k, x]) => `<option value="${k}" ${k === r.field ? "selected" : ""}>${x.label}</option>`).join("")}</select>`;
+  const keySel = f.key === "currency" ? `<select class="rk input-field p-2 text-xs">${optCurrencies(r.key)}</select>`
+    : f.key === "stat" ? `<input class="rk input-field p-2 text-xs font-mono" placeholder="stat" value="${escapeHtml(r.key || "")}">` : `<span></span>`;
+  const opSel = `<select class="ro input-field p-2 text-xs">${f.ops.map((o) => `<option ${o === r.op ? "selected" : ""}>${o}</option>`).join("")}</select>`;
+  let valIn;
+  if (f.val === "role") valIn = `<select class="rv input-field p-2 text-xs"><option value="user">user</option>${rolesArray.map((x) => `<option ${x.name === r.value ? "selected" : ""}>${escapeHtml(x.name)}</option>`).join("")}</select>`;
+  else if (f.val === "bool") valIn = `<select class="rv input-field p-2 text-xs"><option value="true" ${r.value === "true" ? "selected" : ""}>yes</option><option value="false" ${r.value === "false" ? "selected" : ""}>no</option></select>`;
+  else if (f.val === "cosmetic") valIn = `<select class="rv input-field p-2 text-xs">${optCosmetics(r.value)}</select>`;
+  else valIn = `<input class="rv input-field p-2 text-xs" type="${f.val === "number" ? "number" : "text"}" value="${escapeHtml(r.value ?? "")}">`;
+  return `<div class="rule-row" style="grid-template-columns: 1.3fr ${f.key ? "1fr" : "0fr"} .7fr 1fr 22px">${fieldSel}${keySel}${opSel}${valIn}<button class="xbtn" title="Remove rule">×</button></div>`;
+}
+let segDraftRules = [];
+function readSegRules() {
+  return [...document.querySelectorAll("#segRules .rule-row")].map((row) => {
+    const field = row.querySelector(".rf").value;
+    const k = row.querySelector(".rk");
+    return { field, key: k ? k.value.trim() : undefined, op: row.querySelector(".ro").value, value: row.querySelector(".rv").value.trim() };
+  });
+}
+function renderSegRules() {
+  const box = document.getElementById("segRules");
+  box.innerHTML = segDraftRules.length ? segDraftRules.map(ruleRowHtml).join("") : `<p class="text-xs italic mb-3" style="color: var(--text-faint);">No rules yet: every player matches.</p>`;
+  box.querySelectorAll(".rule-row").forEach((row, i) => {
+    row.querySelector(".rf").onchange = (e) => { segDraftRules = readSegRules(); const f = SEG_FIELDS[e.target.value]; segDraftRules[i] = { field: e.target.value, op: f.ops[0], value: f.val === "bool" ? "true" : "", key: f.key === "currency" ? (currenciesArray[0] || {}).id : "" }; renderSegRules(); };
+    row.querySelector(".xbtn").onclick = () => { segDraftRules = readSegRules(); segDraftRules.splice(i, 1); renderSegRules(); };
+    row.querySelectorAll("input,select").forEach((x) => (x.oninput = updateSegPreview));
+  });
+  updateSegPreview();
+}
+async function updateSegPreview() {
+  const rules = readSegRules();
+  if (rules.some((r) => r.field === "stat")) await ensureStats();
+  const n = segmentMembers(rules).length;
+  document.getElementById("segPreview").innerText = `Matches ${n} of ${fullPlayerCache.length} players right now`;
+}
+function addSegRule() { segDraftRules = readSegRules(); segDraftRules.push({ field: "last_seen_days", op: ">=", value: "7" }); renderSegRules(); }
+function resetSegmentForm() {
+  document.getElementById("segFormTitle").innerText = "New segment";
+  document.getElementById("segEditId").value = "";
+  document.getElementById("segName").value = "";
+  document.getElementById("segCancelBtn").classList.add("hidden");
+  segDraftRules = []; renderSegRules();
+}
+function editSegment(s) {
+  document.getElementById("segFormTitle").innerText = "Edit segment";
+  document.getElementById("segEditId").value = s.id;
+  document.getElementById("segName").value = s.name;
+  document.getElementById("segCancelBtn").classList.remove("hidden");
+  segDraftRules = JSON.parse(JSON.stringify(s.rules || [])); renderSegRules();
+  document.getElementById("mainContent").scrollTo({ top: 0, behavior: "smooth" });
+}
+async function submitSegment() {
+  const id = document.getElementById("segEditId").value;
+  const name = document.getElementById("segName").value.trim();
+  const rules = readSegRules();
+  if (!name) { showToast("Give the segment a name.", true); return; }
+  if (rules.some((r) => r.value === "" || (SEG_FIELDS[r.field].key && !r.key))) { showToast("Every rule needs a value.", true); return; }
+  const { error } = id
+    ? await client.from("player_segments").update({ name, rules }).eq("id", id)
+    : await client.from("player_segments").insert([{ project_id: activeProject.id, name, rules }]);
+  if (error) { if (!migrationMissing(error)) showToast("Couldn't save the segment.", true); return; }
+  await logAudit(id ? "update_segment" : "create_segment", { name, rules });
+  resetSegmentForm(); await ensureSegments(true); renderSegments(); showToast("Segment saved.");
+}
+async function loadSegmentsTab() {
+  await ensureSegments(true);
+  if (segmentsArray.some((s) => (s.rules || []).some((r) => r.field === "stat"))) await ensureStats(true);
+  if (!document.getElementById("segEditId").value) resetSegmentForm();
+  renderSegments();
+}
+let openSegmentId = null;
+function renderSegments() {
+  const list = document.getElementById("segmentsList");
+  if (!segmentsArray.length) { list.innerHTML = emptyNote("No segments yet. Try \"Joined, days ago <= 3\" to see your newest players."); return; }
+  list.innerHTML = "";
+  segmentsArray.forEach((s) => {
+    const members = segmentMembers(s.rules);
+    const share = fullPlayerCache.length ? Math.round((members.length / fullPlayerCache.length) * 100) : 0;
+    const el = document.createElement("section");
+    el.className = "mb-7";
+    el.innerHTML = `
+      <h3 class="sec-h" style="font-size:19px">${escapeHtml(s.name)}<span class="aside font-mono">${members.length} players · ${share}%</span></h3>
+      <p class="text-xs font-mono mb-3" style="color: var(--text-dim);">${(s.rules || []).length ? s.rules.map((r) => escapeHtml(describeRule(r))).join(" <span style='color:var(--accent-text)'>and</span> ") : "everyone"}</p>
+      <div class="flex flex-wrap gap-4 text-[11px] font-semibold">
+        <button class="open">${openSegmentId === s.id ? "Hide players" : "Players & bulk actions"}</button>
+        <button class="edit">Edit</button>
+        <button class="csv">Export CSV</button>
+        <button class="del" style="color: var(--danger-text);">Delete</button>
+      </div>
+      <div class="detail ${openSegmentId === s.id ? "" : "hidden"} mt-4 panel p-4"></div>`;
+    el.querySelector(".open").onclick = () => { openSegmentId = openSegmentId === s.id ? null : s.id; renderSegments(); };
+    el.querySelector(".edit").onclick = () => editSegment(s);
+    el.querySelector(".csv").onclick = () => exportSegmentCsv(s, members);
+    el.querySelector(".del").onclick = async () => {
+      if (!confirm(`Delete "${s.name}"? Stores, experiments and tasks that target it will fall back to all players.`)) return;
+      await client.from("player_segments").delete().eq("id", s.id);
+      await logAudit("delete_segment", { name: s.name }); await ensureSegments(true); renderSegments();
+    };
+    if (openSegmentId === s.id) renderSegmentDetail(el.querySelector(".detail"), s, members);
+    list.appendChild(el);
+  });
+}
+function renderSegmentDetail(box, s, members) {
+  box.innerHTML = `
+    <ul class="text-sm mb-4 max-h-56 overflow-y-auto">${members.slice(0, 50).map((p) => `<li class="flex justify-between py-1.5 border-b cursor-pointer" style="border-color: var(--hairline-soft);" data-id="${escapeHtml(p.id)}"><span>${escapeHtml(p.name)}</span><span class="font-mono text-[11px]" style="color: var(--text-faint);">${p.last_seen ? "seen " + fmtWhen(p.last_seen) : "never seen"}</span></li>`).join("") || `<li class="text-xs italic" style="color: var(--text-faint);">Nobody matches right now.</li>`}</ul>
+    ${members.length > 50 ? `<p class="text-[11px] mb-4" style="color: var(--text-faint);">Showing 50 of ${members.length}.</p>` : ""}
+    <h4 class="uppercase text-[10px] tracking-widest mb-2" style="color: var(--text-faint);">Do something to all ${members.length}</h4>
+    <div class="flex flex-wrap gap-2 mb-2">
+      <input type="number" class="amt input-field p-2 text-xs w-24" placeholder="Amount">
+      <select class="cur input-field p-2 text-xs">${optCurrencies()}</select>
+      <button class="give btn-ghost px-3 py-2 text-xs font-semibold">Give currency</button>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <input type="text" class="tag input-field p-2 text-xs w-40" placeholder="tag">
+      <button class="addtag btn-ghost px-3 py-2 text-xs font-semibold">Add tag</button>
+    </div>`;
+  box.querySelectorAll("li[data-id]").forEach((li) => (li.onclick = () => openPlayerDrawer(li.dataset.id)));
+  const run = async (action, params, label) => {
+    if (!members.length) return;
+    if (!confirm(`${label} for ${members.length} players in "${s.name}"?`)) return;
+    const { data, error } = await client.rpc("dashboard_run_action", { p_project_id: activeProject.id, p_action: action, p_params: params, p_segment_id: s.id });
+    if (error) { if (!migrationMissing(error)) showToast(error.message || "That didn't work.", true); return; }
+    await logAudit("segment_" + action, { segment: s.name, params, affected: data });
+    showToast(`Done: ${data} players.`); fetchProjectData();
+  };
+  box.querySelector(".give").onclick = () => {
+    const amount = parseInt(box.querySelector(".amt").value, 10), currency_id = box.querySelector(".cur").value;
+    if (!amount || !currency_id) { showToast("Pick a currency and an amount.", true); return; }
+    run("grant_currency", { currency_id, amount }, `Give ${amount} ${curName(currency_id)}`);
+  };
+  box.querySelector(".addtag").onclick = () => {
+    const tag = box.querySelector(".tag").value.trim();
+    if (!tag) return;
+    run("add_tag", { tag }, `Add tag "${tag}"`);
+  };
+}
+function exportSegmentCsv(s, members) {
+  const rows = [["id", "name", "role", "last_seen", "created_at", "tags"]].concat(members.map((p) => [p.id, p.name, p.role, p.last_seen || "", p.created_at || "", (p.tags || []).join("|")]));
+  const blob = new Blob([rows.map((r) => r.map(csvEscape).join(",")).join("\n")], { type: "text/csv" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${slug(s.name) || "segment"}.csv`; a.click();
+}
+
+// ---- Groups ---------------------------------------------------------------
+let groupsArray = [];
+let openGroupId = null;
+async function loadGroups() {
+  const { data, error } = await client.from("player_groups").select("*, player_group_members(player_id, role, joined_at)").eq("project_id", activeProject.id).order("created_at", { ascending: false });
+  if (error) { migrationMissing(error); groupsArray = []; }
+  else groupsArray = data || [];
+  document.getElementById("grpOwner").innerHTML = `<option value="">Leader (optional)</option>` + fullPlayerCache.map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("");
+  renderGroups();
+}
+function renderGroups() {
+  const list = document.getElementById("groupsList");
+  if (!groupsArray.length) { list.innerHTML = emptyNote("No groups yet."); renderGroupDetail(); return; }
+  list.innerHTML = groupsArray.map((g) => {
+    const n = (g.player_group_members || []).length;
+    return `<button data-id="${g.id}" class="grp w-full text-left row" style="grid-template-columns: 56px 1fr auto; ${g.id === openGroupId ? "background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent);" : ""}">
+      <span class="font-mono text-xs pl-2" style="color: var(--accent-text);">[${escapeHtml(g.tag || "")}]</span>
+      <span class="font-semibold truncate">${escapeHtml(g.name)}</span>
+      <span class="font-mono text-[11px] pr-2" style="color: ${n >= g.max_members ? "var(--danger-text)" : "var(--text-faint)"};">${n}/${g.max_members}</span></button>`;
+  }).join("");
+  list.querySelectorAll(".grp").forEach((b) => (b.onclick = () => { openGroupId = b.dataset.id; renderGroups(); }));
+  renderGroupDetail();
+}
+function renderGroupDetail() {
+  const box = document.getElementById("groupDetail");
+  const g = groupsArray.find((x) => x.id === openGroupId);
+  if (!g) { box.innerHTML = emptyNote("Pick a group to see its members."); return; }
+  const rank = { leader: 0, officer: 1, member: 2 };
+  const members = [...(g.player_group_members || [])].sort((a, b) => rank[a.role] - rank[b.role] || new Date(a.joined_at) - new Date(b.joined_at));
+  const inGroup = new Set(members.map((m) => m.player_id));
+  box.innerHTML = `
+    <div class="flex items-baseline gap-3 mb-1"><h2 class="font-display" style="font-size:34px; font-weight:500; line-height:1">${escapeHtml(g.name)}</h2><span class="font-mono text-sm" style="color: var(--accent-text);">[${escapeHtml(g.tag || "")}]</span></div>
+    <p class="text-xs font-mono mb-6" style="color: var(--text-faint);">founded ${fmtWhen(g.created_at)} · ${members.length} of ${g.max_members} seats</p>
+    <div class="panel px-4 mb-4">${members.map((m) => `
+      <div class="row" style="grid-template-columns: 1fr 110px 24px" data-pid="${escapeHtml(m.player_id)}">
+        <button class="pname text-left truncate ${m.role === "leader" ? "font-semibold" : ""}">${escapeHtml(playerName(m.player_id))}</button>
+        <select class="mrole input-field p-1.5 text-xs">${["leader", "officer", "member"].map((r) => `<option ${r === m.role ? "selected" : ""}>${r}</option>`).join("")}</select>
+        <button class="xbtn" title="Remove from group">×</button>
+      </div>`).join("") || `<p class="py-6 text-xs italic" style="color: var(--text-faint);">Empty.</p>`}</div>
+    <div class="flex gap-2 mb-8">
+      <select id="grpAddPlayer" class="flex-1 p-2.5 input-field text-xs">${fullPlayerCache.filter((p) => !inGroup.has(p.id)).map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("")}</select>
+      <button id="grpAddBtn" class="btn-ghost px-4 text-xs font-semibold">Add member</button>
+    </div>
+    <button id="grpDelBtn" class="text-[11px] font-semibold" style="color: var(--danger-text);">Disband this group</button>`;
+  box.querySelectorAll("[data-pid]").forEach((row) => {
+    const pid = row.dataset.pid;
+    row.querySelector(".pname").onclick = () => openPlayerDrawer(pid);
+    row.querySelector(".mrole").onchange = async (e) => {
+      const { error } = await client.from("player_group_members").update({ role: e.target.value }).eq("group_id", g.id).eq("player_id", pid);
+      if (error) { showToast("Couldn't change rank.", true); return; }
+      await logAudit("group_rank", { group: g.name, player: pid, role: e.target.value }); loadGroups();
+    };
+    row.querySelector(".xbtn").onclick = async () => {
+      if (!confirm(`Remove ${playerName(pid)} from ${g.name}?`)) return;
+      await client.from("player_group_members").delete().eq("group_id", g.id).eq("player_id", pid);
+      await logAudit("group_remove", { group: g.name, player: pid }); loadGroups();
+    };
+  });
+  box.querySelector("#grpAddBtn").onclick = async () => {
+    const pid = box.querySelector("#grpAddPlayer").value;
+    if (!pid) return;
+    if (members.length >= g.max_members) { showToast("This group is full.", true); return; }
+    const { error } = await client.from("player_group_members").insert([{ group_id: g.id, player_id: pid, role: "member" }]);
+    if (error) { showToast("Couldn't add them.", true); return; }
+    await logAudit("group_add", { group: g.name, player: pid }); loadGroups();
+  };
+  box.querySelector("#grpDelBtn").onclick = async () => {
+    if (!confirm(`Disband ${g.name}? Members are removed; the players themselves are untouched.`)) return;
+    await client.from("player_groups").delete().eq("id", g.id);
+    await logAudit("group_disband", { group: g.name }); openGroupId = null; loadGroups();
+  };
+}
+async function submitGroup() {
+  const name = document.getElementById("grpName").value.trim();
+  const tag = document.getElementById("grpTag").value.trim().toUpperCase();
+  const owner = document.getElementById("grpOwner").value || null;
+  const max_members = Math.max(2, parseInt(document.getElementById("grpMax").value, 10) || 50);
+  if (!name || !/^[A-Z0-9]{2,5}$/.test(tag)) { showToast("Needs a name and a 2 to 5 character tag.", true); return; }
+  const { data, error } = await client.from("player_groups").insert([{ project_id: activeProject.id, name, tag, owner_id: owner, max_members }]).select().single();
+  if (error) { if (!migrationMissing(error)) showToast(/duplicate/.test(error.message) ? "That name or tag is taken." : "Couldn't create the group.", true); return; }
+  if (owner) await client.from("player_group_members").insert([{ group_id: data.id, player_id: owner, role: "leader" }]);
+  await logAudit("group_create", { name, tag });
+  ["grpName", "grpTag"].forEach((id) => (document.getElementById(id).value = ""));
+  openGroupId = data.id; loadGroups();
+}
+
+// ---- Stores & bundles -----------------------------------------------------
+let storesArray = [];
+let salesByKey = {};
+wireSeg("storeViewSeg", (v) => {
+  document.getElementById("storesView").classList.toggle("hidden", v !== "stores");
+  document.getElementById("bundlesView").classList.toggle("hidden", v !== "bundles");
+});
+async function loadStoresTab() {
+  await ensureSegments();
+  const [b, s, sales] = await Promise.all([
+    client.from("bundles").select("*").eq("project_id", activeProject.id).order("created_at"),
+    client.from("stores").select("*, store_items(*)").eq("project_id", activeProject.id).order("created_at"),
+    client.from("purchases").select("store_id, item_ref").eq("project_id", activeProject.id).limit(20000),
+  ]);
+  if (b.error) { migrationMissing(b.error); return; }
+  bundlesArray = b.data || []; storesArray = s.data || [];
+  salesByKey = {};
+  (sales.data || []).forEach((p) => { const k = `${p.store_id}|${p.item_ref}`; salesByKey[k] = (salesByKey[k] || 0) + 1; });
+  document.getElementById("storeSegment").innerHTML = optSegments(document.getElementById("storeSegment").value, "Visible to every player");
+  document.getElementById("bundleCurrency").innerHTML = optCurrencies(document.getElementById("bundleCurrency").value);
+  document.getElementById("bundleCosmetics").innerHTML = optCosmetics();
+  document.getElementById("bundleCurrencyInputs").innerHTML = currenciesArray.map((c) => `<label class="flex items-center gap-2 text-xs"><span class="w-24 truncate" style="color: var(--text-dim);">+ ${escapeHtml(c.name)}</span><input type="number" min="0" data-cur="${c.id}" class="bcur w-full p-2 input-field text-xs" placeholder="0"></label>`).join("");
+  if (!document.getElementById("storeEditId").value && !document.querySelector("#storeItemRows .rule-row")) addStoreItemRow();
+  renderStores(); renderBundles();
+}
+function itemCatalogPrice(kind, ref) {
+  if (kind === "bundle") { const b = bundlesArray.find((x) => x.bundle_id === ref); return b ? { price: b.price, currency_id: b.currency_id, name: b.name } : null; }
+  const c = globalCatalog.find((x) => x.id === ref); return c ? { price: c.price, currency_id: c.currency_id, name: c.name } : null;
+}
+function storeItemRowHtml(it) {
+  const kind = it.item_kind || "cosmetic";
+  const refOpts = kind === "bundle" ? bundlesArray.map((b) => `<option value="${escapeHtml(b.bundle_id)}" ${b.bundle_id === it.item_ref ? "selected" : ""}>${escapeHtml(b.name)}</option>`).join("") : optCosmetics(it.item_ref);
+  return `<div class="rule-row item-row">
+    <select class="sk input-field p-2 text-xs"><option value="cosmetic" ${kind === "cosmetic" ? "selected" : ""}>Cosmetic</option><option value="bundle" ${kind === "bundle" ? "selected" : ""}>Bundle</option></select>
+    <select class="sr input-field p-2 text-xs">${refOpts}</select>
+    <input class="sp input-field p-2 text-xs" type="number" min="0" placeholder="price" value="${it.price ?? ""}">
+    <select class="sc input-field p-2 text-xs">${optCurrencies(it.currency_id)}</select>
+    <button class="xbtn" title="Remove">×</button></div>`;
+}
+function readStoreItems() {
+  return [...document.querySelectorAll("#storeItemRows .rule-row")].map((r, i) => ({ item_kind: r.querySelector(".sk").value, item_ref: r.querySelector(".sr").value, price: parseInt(r.querySelector(".sp").value, 10), currency_id: r.querySelector(".sc").value || null, sort: i }));
+}
+function renderStoreItemRows(items) {
+  const box = document.getElementById("storeItemRows");
+  box.innerHTML = items.map(storeItemRowHtml).join("");
+  box.querySelectorAll(".rule-row").forEach((row, i) => {
+    row.querySelector(".xbtn").onclick = () => { const cur = readStoreItems(); cur.splice(i, 1); renderStoreItemRows(cur); };
+    row.querySelector(".sk").onchange = () => { const cur = readStoreItems(); cur[i] = { item_kind: row.querySelector(".sk").value }; renderStoreItemRows(cur); };
+    row.querySelector(".sr").onchange = () => { // prefill with the catalog price so a sale is an edit, not a lookup
+      const cp = itemCatalogPrice(row.querySelector(".sk").value, row.querySelector(".sr").value);
+      if (cp && !row.querySelector(".sp").value) { row.querySelector(".sp").value = cp.price; row.querySelector(".sc").value = cp.currency_id || ""; }
+    };
+  });
+}
+function addStoreItemRow() {
+  const cur = readStoreItems();
+  const first = globalCatalog[0];
+  cur.push(first ? { item_kind: "cosmetic", item_ref: first.id, price: first.price, currency_id: first.currency_id } : { item_kind: "cosmetic" });
+  renderStoreItemRows(cur);
+}
+function resetStoreForm() {
+  document.getElementById("storeFormTitle").innerText = "New store";
+  ["storeEditId", "storeKey", "storeName", "storeStarts", "storeEnds"].forEach((id) => (document.getElementById(id).value = ""));
+  document.getElementById("storeSegment").value = "";
+  document.getElementById("storeActive").checked = true;
+  document.getElementById("storeCancelBtn").classList.add("hidden");
+  renderStoreItemRows([]); addStoreItemRow();
+}
+function editStore(st) {
+  document.getElementById("storeFormTitle").innerText = "Edit store";
+  document.getElementById("storeEditId").value = st.id;
+  document.getElementById("storeKey").value = st.store_id;
+  document.getElementById("storeName").value = st.name;
+  document.getElementById("storeSegment").value = st.segment_id || "";
+  document.getElementById("storeStarts").value = toLocalInput(st.starts_at);
+  document.getElementById("storeEnds").value = toLocalInput(st.ends_at);
+  document.getElementById("storeActive").checked = st.is_active;
+  document.getElementById("storeCancelBtn").classList.remove("hidden");
+  renderStoreItemRows([...(st.store_items || [])].sort((a, b) => a.sort - b.sort));
+  document.getElementById("mainContent").scrollTo({ top: 0, behavior: "smooth" });
+}
+async function submitStore() {
+  const id = document.getElementById("storeEditId").value;
+  const store_id = slug(document.getElementById("storeKey").value || document.getElementById("storeName").value);
+  const name = document.getElementById("storeName").value.trim();
+  const items = readStoreItems().filter((x) => x.item_ref);
+  if (!store_id || !name) { showToast("A store needs an id and a name.", true); return; }
+  if (items.some((x) => Number.isNaN(x.price) || x.price < 0 || !x.currency_id)) { showToast("Every item needs a price and a currency.", true); return; }
+  const row = { project_id: activeProject.id, store_id, name, segment_id: document.getElementById("storeSegment").value || null,
+    starts_at: fromLocalInput(document.getElementById("storeStarts").value), ends_at: fromLocalInput(document.getElementById("storeEnds").value),
+    is_active: document.getElementById("storeActive").checked };
+  const res = id ? await client.from("stores").update(row).eq("id", id).select().single() : await client.from("stores").insert([row]).select().single();
+  if (res.error) { if (!migrationMissing(res.error)) showToast(/duplicate/.test(res.error.message) ? "That store_id is already used." : "Couldn't save the store.", true); return; }
+  const sid = res.data.id;
+  await client.from("store_items").delete().eq("store_id", sid);
+  if (items.length) {
+    const { error } = await client.from("store_items").insert(items.map((x) => ({ ...x, store_id: sid })));
+    if (error) { showToast("Store saved, but its items didn't.", true); return; }
+  }
+  await logAudit(id ? "update_store" : "create_store", { store_id, items: items.length });
+  resetStoreForm(); loadStoresTab(); showToast("Store saved.");
+}
+function storeState(st) {
+  const now = Date.now();
+  if (!st.is_active) return ["off", "closed"];
+  if (st.starts_at && new Date(st.starts_at) > now) return ["draft", "opens " + fmtWhen(st.starts_at)];
+  if (st.ends_at && new Date(st.ends_at) < now) return ["off", "ended " + fmtWhen(st.ends_at)];
+  return ["live", st.ends_at ? "open until " + fmtWhen(st.ends_at) : "open"];
+}
+function renderStores() {
+  const list = document.getElementById("storesList");
+  if (!storesArray.length) { list.innerHTML = emptyNote("No stores yet. Your game can still sell straight from the catalog."); return; }
+  list.innerHTML = "";
+  storesArray.forEach((st) => {
+    const [cls, label] = storeState(st);
+    const items = [...(st.store_items || [])].sort((a, b) => a.sort - b.sort);
+    const el = document.createElement("section");
+    el.className = "mb-8";
+    el.innerHTML = `
+      <h3 class="sec-h" style="font-size:19px">${escapeHtml(st.name)}<span class="aside"><span class="pill ${cls}">${label}</span></span></h3>
+      <p class="text-[11px] font-mono mb-3" style="color: var(--text-faint);">${escapeHtml(st.store_id)} · ${st.segment_id ? "only " + escapeHtml(segName(st.segment_id)) : "every player"}</p>
+      <div>${items.map((it) => {
+        const cp = itemCatalogPrice(it.item_kind, it.item_ref);
+        const sale = cp && cp.currency_id === it.currency_id && it.price < cp.price;
+        const pct = sale && cp.price ? Math.round((1 - it.price / cp.price) * 100) : 0;
+        const sold = salesByKey[`${st.id}|${it.item_ref}`] || 0;
+        return `<div class="row" style="grid-template-columns: 1fr auto 70px">
+          <span class="truncate">${escapeHtml(cp ? cp.name : it.item_ref)}${it.item_kind === "bundle" ? ` <span class="pill off" style="margin-left:6px">bundle</span>` : ""}</span>
+          <span class="font-mono text-xs text-right">${sale ? `<span class="was">${cp.price}</span>` : ""}${it.price} ${escapeHtml(curName(it.currency_id))}${pct ? `<span class="off-tag">-${pct}%</span>` : ""}</span>
+          <span class="font-mono text-[11px] text-right" style="color: var(--text-faint);">${sold} sold</span></div>`;
+      }).join("") || `<p class="text-xs italic py-3" style="color: var(--text-faint);">Empty shelf.</p>`}</div>
+      <div class="flex gap-4 mt-3 text-[11px] font-semibold"><button class="edit">Edit</button><button class="del" style="color: var(--danger-text);">Delete</button></div>`;
+    el.querySelector(".edit").onclick = () => editStore(st);
+    el.querySelector(".del").onclick = async () => {
+      if (!confirm(`Delete store "${st.name}"? Past purchases stay in the ledger.`)) return;
+      await client.from("stores").delete().eq("id", st.id); await logAudit("delete_store", { store_id: st.store_id }); loadStoresTab();
+    };
+    list.appendChild(el);
+  });
+}
+function bundleContents(b) {
+  const c = b.contents || {};
+  return [...(c.cosmetics || []).map(cosName), ...(c.currencies || []).map((x) => `${x.amount} ${curName(x.currency_id)}`)];
+}
+function renderBundles() {
+  const list = document.getElementById("bundlesList");
+  if (!bundlesArray.length) { list.innerHTML = emptyNote("No bundles yet."); return; }
+  list.innerHTML = "";
+  bundlesArray.forEach((b) => {
+    const parts = bundleContents(b);
+    // what the pieces would cost bought one by one, in the bundle's currency
+    const alone = (b.contents?.cosmetics || []).reduce((sum, id) => { const c = globalCatalog.find((x) => x.id === id); return c && c.currency_id === b.currency_id ? sum + (c.price || 0) : sum; }, 0);
+    const el = document.createElement("div");
+    el.className = "row";
+    el.style.gridTemplateColumns = "1fr auto";
+    el.innerHTML = `<div class="min-w-0"><div class="font-semibold">${escapeHtml(b.name)} <span class="font-mono text-[11px] font-normal" style="color: var(--text-faint);">${escapeHtml(b.bundle_id)}</span></div>
+        <div class="text-xs mt-1" style="color: var(--text-dim);">${parts.map(escapeHtml).join(" + ") || "empty"}</div>
+        <div class="flex gap-4 mt-2 text-[11px] font-semibold"><button class="edit">Edit</button><button class="del" style="color: var(--danger-text);">Delete</button></div></div>
+      <div class="text-right font-mono text-sm">${alone > b.price ? `<span class="was">${alone}</span>` : ""}${b.price} ${escapeHtml(curName(b.currency_id))}</div>`;
+    el.querySelector(".edit").onclick = () => editBundle(b);
+    el.querySelector(".del").onclick = async () => {
+      if (!confirm(`Delete bundle "${b.name}"? Stores selling it will show it as missing.`)) return;
+      await client.from("bundles").delete().eq("id", b.id); await logAudit("delete_bundle", { bundle_id: b.bundle_id }); loadStoresTab();
+    };
+    list.appendChild(el);
+  });
+}
+function resetBundleForm() {
+  document.getElementById("bundleFormTitle").innerText = "New bundle";
+  ["bundleEditId", "bundleKey", "bundleName", "bundlePrice"].forEach((id) => (document.getElementById(id).value = ""));
+  [...document.getElementById("bundleCosmetics").options].forEach((o) => (o.selected = false));
+  document.querySelectorAll(".bcur").forEach((i) => (i.value = ""));
+  document.getElementById("bundleCancelBtn").classList.add("hidden");
+}
+function editBundle(b) {
+  document.getElementById("bundleFormTitle").innerText = "Edit bundle";
+  document.getElementById("bundleEditId").value = b.id;
+  document.getElementById("bundleKey").value = b.bundle_id;
+  document.getElementById("bundleName").value = b.name;
+  document.getElementById("bundlePrice").value = b.price;
+  document.getElementById("bundleCurrency").value = b.currency_id || "";
+  const cs = new Set(b.contents?.cosmetics || []);
+  [...document.getElementById("bundleCosmetics").options].forEach((o) => (o.selected = cs.has(o.value)));
+  document.querySelectorAll(".bcur").forEach((i) => { const x = (b.contents?.currencies || []).find((c) => c.currency_id === i.dataset.cur); i.value = x ? x.amount : ""; });
+  document.getElementById("bundleCancelBtn").classList.remove("hidden");
+}
+async function submitBundle() {
+  const id = document.getElementById("bundleEditId").value;
+  const bundle_id = slug(document.getElementById("bundleKey").value || document.getElementById("bundleName").value);
+  const name = document.getElementById("bundleName").value.trim();
+  const price = parseInt(document.getElementById("bundlePrice").value, 10);
+  const currency_id = document.getElementById("bundleCurrency").value || null;
+  const contents = {
+    cosmetics: [...document.getElementById("bundleCosmetics").selectedOptions].map((o) => o.value),
+    currencies: [...document.querySelectorAll(".bcur")].map((i) => ({ currency_id: i.dataset.cur, amount: parseInt(i.value, 10) || 0 })).filter((x) => x.amount > 0),
+  };
+  if (!bundle_id || !name || Number.isNaN(price) || !currency_id) { showToast("A bundle needs an id, name, price and currency.", true); return; }
+  if (!contents.cosmetics.length && !contents.currencies.length) { showToast("Put something in the bundle.", true); return; }
+  const row = { project_id: activeProject.id, bundle_id, name, price, currency_id, contents };
+  const { error } = id ? await client.from("bundles").update(row).eq("id", id) : await client.from("bundles").insert([row]);
+  if (error) { if (!migrationMissing(error)) showToast(/duplicate/.test(error.message) ? "That bundle_id is already used." : "Couldn't save the bundle.", true); return; }
+  await logAudit(id ? "update_bundle" : "create_bundle", { bundle_id });
+  resetBundleForm(); loadStoresTab(); showToast("Bundle saved.");
+}
+
+// ---- Drop tables ------------------------------------------------------------
+async function loadDropTables() {
+  const { data, error } = await client.from("drop_tables").select("*").eq("project_id", activeProject.id).order("created_at");
+  if (error) { migrationMissing(error); return; }
+  dropTablesArray = data || [];
+  if (!document.getElementById("dtEditId").value && !document.querySelector("#dtRows .rule-row")) { addDropRow(); addDropRow("nothing"); }
+  renderDropTables();
+}
+function dropRowHtml(e) {
+  const k = e.kind || "cosmetic";
+  let ref = `<span></span>`;
+  if (k === "cosmetic") ref = `<select class="dr input-field p-2 text-xs">${optCosmetics(e.ref)}</select>`;
+  if (k === "currency") ref = `<div class="flex gap-1"><input class="da input-field p-2 text-xs w-16" type="number" min="1" placeholder="amt" value="${e.amount ?? ""}"><select class="dr input-field p-2 text-xs flex-1 min-w-0">${optCurrencies(e.ref)}</select></div>`;
+  if (k === "table") ref = `<select class="dr input-field p-2 text-xs">${dropTablesArray.filter((t) => t.id !== document.getElementById("dtEditId").value).map((t) => `<option value="${escapeHtml(t.table_id)}" ${t.table_id === e.ref ? "selected" : ""}>${escapeHtml(t.name)}</option>`).join("")}</select>`;
+  return `<div class="rule-row" style="grid-template-columns: .9fr 1.6fr .6fr 22px">
+    <select class="dk input-field p-2 text-xs">${["cosmetic", "currency", "table", "nothing"].map((x) => `<option ${x === k ? "selected" : ""}>${x}</option>`).join("")}</select>
+    ${ref}<input class="dw input-field p-2 text-xs" type="number" min="1" title="weight" placeholder="weight" value="${e.weight ?? 10}">
+    <button class="xbtn" title="Remove">×</button></div>`;
+}
+function readDropRows() {
+  return [...document.querySelectorAll("#dtRows .rule-row")].map((r) => {
+    const kind = r.querySelector(".dk").value, e = { kind, weight: parseInt(r.querySelector(".dw").value, 10) || 0 };
+    if (r.querySelector(".dr")) e.ref = r.querySelector(".dr").value;
+    if (r.querySelector(".da")) e.amount = parseInt(r.querySelector(".da").value, 10) || 0;
+    return e;
+  });
+}
+function renderDropRows(rows) {
+  const box = document.getElementById("dtRows");
+  box.innerHTML = rows.map(dropRowHtml).join("") + `<div id="dtOddsPreview" class="mb-3"></div>`;
+  box.querySelectorAll(".rule-row").forEach((row, i) => {
+    row.querySelector(".xbtn").onclick = () => { const cur = readDropRows(); cur.splice(i, 1); renderDropRows(cur); };
+    row.querySelector(".dk").onchange = () => { const cur = readDropRows(); cur[i] = { kind: row.querySelector(".dk").value, weight: cur[i].weight }; renderDropRows(cur); };
+    row.querySelector(".dw").oninput = previewDropOdds;
+  });
+  previewDropOdds();
+}
+function previewDropOdds() {
+  const rows = readDropRows(), total = rows.reduce((s, e) => s + e.weight, 0);
+  const el = document.getElementById("dtOddsPreview");
+  if (el) el.innerHTML = total ? `<p class="text-[11px] font-mono" style="color: var(--text-faint);">total weight ${total} · ${rows.map((e) => ((e.weight / total) * 100).toFixed(e.weight / total < 0.1 ? 1 : 0) + "%").join(" / ")}</p>` : "";
+}
+function addDropRow(kind) { const cur = readDropRows(); cur.push({ kind: kind || "cosmetic", weight: kind === "nothing" ? 50 : 10 }); renderDropRows(cur); }
+function resetDropForm() {
+  document.getElementById("dtFormTitle").innerText = "New drop table";
+  ["dtEditId", "dtKey", "dtName"].forEach((id) => (document.getElementById(id).value = ""));
+  document.getElementById("dtCancelBtn").classList.add("hidden");
+  renderDropRows([]); addDropRow(); addDropRow("nothing");
+}
+function editDropTable(t) {
+  document.getElementById("dtFormTitle").innerText = "Edit drop table";
+  document.getElementById("dtEditId").value = t.id;
+  document.getElementById("dtKey").value = t.table_id;
+  document.getElementById("dtName").value = t.name;
+  document.getElementById("dtCancelBtn").classList.remove("hidden");
+  renderDropRows(t.entries || []);
+  document.getElementById("mainContent").scrollTo({ top: 0, behavior: "smooth" });
+}
+async function submitDropTable() {
+  const id = document.getElementById("dtEditId").value;
+  const table_id = slug(document.getElementById("dtKey").value || document.getElementById("dtName").value);
+  const name = document.getElementById("dtName").value.trim();
+  const entries = readDropRows().filter((e) => e.weight > 0);
+  if (!table_id || !name) { showToast("A table needs an id and a name.", true); return; }
+  if (!entries.length) { showToast("Add at least one outcome with a weight.", true); return; }
+  if (entries.some((e) => (e.kind === "cosmetic" || e.kind === "table" || e.kind === "currency") && !e.ref) || entries.some((e) => e.kind === "currency" && !e.amount)) { showToast("Every outcome needs something to give.", true); return; }
+  const row = { project_id: activeProject.id, table_id, name, entries };
+  const { error } = id ? await client.from("drop_tables").update(row).eq("id", id) : await client.from("drop_tables").insert([row]);
+  if (error) { if (!migrationMissing(error)) showToast(/duplicate/.test(error.message) ? "That table_id is already used." : "Couldn't save.", true); return; }
+  await logAudit(id ? "update_drop_table" : "create_drop_table", { table_id });
+  resetDropForm(); loadDropTables(); showToast("Drop table saved.");
+}
+function describeOutcome(e) {
+  if (e.kind === "cosmetic") return cosName(e.ref);
+  if (e.kind === "currency") return `${e.amount} ${curName(e.ref)}`;
+  if (e.kind === "table") return `a roll on "${(dropTablesArray.find((t) => t.table_id === e.ref) || {}).name || e.ref}"`;
+  return "nothing";
+}
+// Same algorithm as roll_drop_table() in SQL: weighted pick, nested tables up to 3 deep.
+function rollOnce(tableId, depth) {
+  const t = dropTablesArray.find((x) => x.table_id === tableId);
+  if (!t || depth > 3) return "nothing";
+  const entries = t.entries || [], total = entries.reduce((s, e) => s + e.weight, 0);
+  let r = Math.random() * total;
+  for (const e of entries) { r -= e.weight; if (r < 0) return e.kind === "table" ? rollOnce(e.ref, depth + 1) : describeOutcome(e); }
+  return "nothing";
+}
+function renderDropTables() {
+  const list = document.getElementById("dropTablesList");
+  if (!dropTablesArray.length) { list.innerHTML = emptyNote("No drop tables yet."); return; }
+  list.innerHTML = "";
+  dropTablesArray.forEach((t) => {
+    const entries = t.entries || [], total = entries.reduce((s, e) => s + e.weight, 0) || 1;
+    const minW = Math.min(...entries.filter((e) => e.kind !== "nothing").map((e) => e.weight));
+    const el = document.createElement("section");
+    el.className = "mb-8";
+    el.innerHTML = `
+      <h3 class="sec-h" style="font-size:19px">${escapeHtml(t.name)}<span class="aside font-mono">${escapeHtml(t.table_id)}</span></h3>
+      ${entries.map((e) => {
+        const p = e.weight / total;
+        return `<div class="row" style="grid-template-columns: 1fr 120px 52px; padding: 8px 0;">
+          <span class="text-sm truncate" style="${e.kind === "nothing" ? "color: var(--text-faint)" : ""}">${escapeHtml(describeOutcome(e))}</span>
+          <div class="odds ${e.weight === minW && e.kind !== "nothing" && entries.length > 2 ? "rare" : ""}"><i style="width:${(p * 100).toFixed(1)}%"></i></div>
+          <span class="font-mono text-xs text-right">${(p * 100).toFixed(p < 0.1 ? 1 : 0)}%</span></div>`;
+      }).join("")}
+      <div class="sim mt-3"></div>
+      <div class="flex gap-4 mt-3 text-[11px] font-semibold"><button class="simbtn">Simulate 1,000 rolls</button><button class="edit">Edit</button><button class="del" style="color: var(--danger-text);">Delete</button></div>`;
+    el.querySelector(".simbtn").onclick = () => {
+      const counts = {};
+      for (let i = 0; i < 1000; i++) { const o = rollOnce(t.table_id, 0); counts[o] = (counts[o] || 0) + 1; }
+      el.querySelector(".sim").innerHTML = `<div class="panel-raised p-3 text-xs font-mono">${Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="flex justify-between py-0.5"><span>${escapeHtml(k)}</span><span>${v}</span></div>`).join("")}</div>`;
+    };
+    el.querySelector(".edit").onclick = () => editDropTable(t);
+    el.querySelector(".del").onclick = async () => {
+      if (!confirm(`Delete "${t.name}"?`)) return;
+      await client.from("drop_tables").delete().eq("id", t.id); await logAudit("delete_drop_table", { table_id: t.table_id }); loadDropTables();
+    };
+    list.appendChild(el);
+  });
+}
+
+// ---- Experiments ----------------------------------------------------------
+let experimentsArray = [];
+function variantRowHtml(v) {
+  const ov = Object.entries(v.overrides || {}).map(([k, x]) => `${k}=${x}`).join("\n");
+  return `<div class="panel-raised p-3 mb-2 vrow">
+    <div class="flex gap-2 mb-2"><input class="vn input-field p-2 text-xs font-mono flex-1" placeholder="variant name" value="${escapeHtml(v.name || "")}">
+      <input class="vw input-field p-2 text-xs w-20" type="number" min="1" title="weight" value="${v.weight ?? 50}"><button class="xbtn px-1" title="Remove">×</button></div>
+    <textarea class="vo input-field p-2 text-xs font-mono w-full" rows="2" placeholder="title_data_key=value (one per line)">${escapeHtml(ov)}</textarea></div>`;
+}
+function readVariants() {
+  return [...document.querySelectorAll("#expVariants .vrow")].map((r) => {
+    const overrides = {};
+    r.querySelector(".vo").value.split("\n").forEach((line) => { const i = line.indexOf("="); if (i > 0) overrides[line.slice(0, i).trim()] = line.slice(i + 1).trim(); });
+    return { name: slug(r.querySelector(".vn").value), weight: parseInt(r.querySelector(".vw").value, 10) || 0, overrides };
+  });
+}
+function renderVariantRows(vs) {
+  const box = document.getElementById("expVariants");
+  box.innerHTML = vs.map(variantRowHtml).join("");
+  box.querySelectorAll(".vrow").forEach((r, i) => (r.querySelector(".xbtn").onclick = () => { const cur = readVariants(); cur.splice(i, 1); renderVariantRows(cur); }));
+}
+function addVariantRow() { const cur = readVariants(); cur.push({ name: cur.length ? "variant_" + String.fromCharCode(97 + cur.length - 1) : "control", weight: 50 }); renderVariantRows(cur); }
+function resetExperimentForm() {
+  document.getElementById("expFormTitle").innerText = "New experiment";
+  ["expEditId", "expName", "expDesc", "expMetric"].forEach((id) => (document.getElementById(id).value = ""));
+  document.getElementById("expSegment").value = "";
+  document.getElementById("expCancelBtn").classList.add("hidden");
+  renderVariantRows([{ name: "control", weight: 50 }, { name: "variant_a", weight: 50 }]);
+}
+function editExperiment(x) {
+  document.getElementById("expFormTitle").innerText = "Edit experiment";
+  document.getElementById("expEditId").value = x.id;
+  document.getElementById("expName").value = x.name;
+  document.getElementById("expDesc").value = x.description || "";
+  document.getElementById("expSegment").value = x.segment_id || "";
+  document.getElementById("expMetric").value = x.metric_event || "";
+  document.getElementById("expCancelBtn").classList.remove("hidden");
+  renderVariantRows(x.variants || []);
+  document.getElementById("mainContent").scrollTo({ top: 0, behavior: "smooth" });
+}
+async function submitExperiment() {
+  const id = document.getElementById("expEditId").value;
+  const name = document.getElementById("expName").value.trim();
+  const variants = readVariants();
+  if (!name) { showToast("Name the experiment.", true); return; }
+  if (variants.length < 2 || variants.some((v) => !v.name || v.weight <= 0)) { showToast("Needs at least two named variants with weights.", true); return; }
+  if (new Set(variants.map((v) => v.name)).size !== variants.length) { showToast("Variant names must be different.", true); return; }
+  const row = { project_id: activeProject.id, name, description: document.getElementById("expDesc").value.trim(), segment_id: document.getElementById("expSegment").value || null,
+    metric_event: document.getElementById("expMetric").value.trim() || null, variants };
+  const { error } = id ? await client.from("experiments").update(row).eq("id", id) : await client.from("experiments").insert([{ ...row, status: "draft" }]);
+  if (error) { if (!migrationMissing(error)) showToast("Couldn't save.", true); return; }
+  await logAudit(id ? "update_experiment" : "create_experiment", { name });
+  resetExperimentForm(); loadExperiments(); showToast("Experiment saved.");
+}
+async function loadExperiments() {
+  await ensureSegments();
+  document.getElementById("expSegment").innerHTML = optSegments(document.getElementById("expSegment").value, "All players can be enrolled");
+  if (!document.querySelector("#expVariants .vrow")) resetExperimentForm();
+  const { data, error } = await client.from("experiments").select("*, experiment_assignments(player_id, variant, assigned_at)").eq("project_id", activeProject.id).order("created_at", { ascending: false });
+  if (error) { migrationMissing(error); return; }
+  experimentsArray = data || [];
+  const list = document.getElementById("experimentsList");
+  if (!experimentsArray.length) { list.innerHTML = emptyNote("No experiments yet."); return; }
+  list.innerHTML = "";
+  for (const x of experimentsArray) {
+    const assigned = x.experiment_assignments || [];
+    let converted = new Set();
+    if (x.metric_event && x.started_at && assigned.length) {
+      const { data: ev } = await client.from("player_events").select("player_id, ts").eq("project_id", activeProject.id).eq("event_name", x.metric_event).gte("ts", x.started_at).limit(20000);
+      const firstAssign = Object.fromEntries(assigned.map((a) => [a.player_id, new Date(a.assigned_at)]));
+      (ev || []).forEach((e) => { if (firstAssign[e.player_id] && new Date(e.ts) >= firstAssign[e.player_id]) converted.add(e.player_id); });
+    }
+    const vs = x.variants || [], wt = vs.reduce((s, v) => s + v.weight, 0) || 1;
+    const pill = x.status === "running" ? `<span class="pill live">running since ${fmtWhen(x.started_at)}</span>` : x.status === "draft" ? `<span class="pill draft">draft</span>` : `<span class="pill off">stopped ${fmtWhen(x.stopped_at)}</span>`;
+    const el = document.createElement("section");
+    el.className = "mb-9";
+    el.innerHTML = `
+      <h3 class="sec-h" style="font-size:19px">${escapeHtml(x.name)}<span class="aside">${pill}</span></h3>
+      ${x.description ? `<p class="text-sm mb-3" style="color: var(--text-dim);">${escapeHtml(x.description)}</p>` : ""}
+      <div class="split mb-3">${vs.map((v) => `<span style="flex:${v.weight}">${escapeHtml(v.name)} ${Math.round((v.weight / wt) * 100)}%</span>`).join("")}</div>
+      <p class="text-[11px] font-mono mb-2" style="color: var(--text-faint);">${x.segment_id ? "enrolls " + escapeHtml(segName(x.segment_id)) : "enrolls every player"}${x.metric_event ? " · success = " + escapeHtml(x.metric_event) : " · no success event set"}</p>
+      <div class="tbl" style="border-top: 2px solid var(--text)">${vs.map((v) => {
+        const inV = assigned.filter((a) => a.variant === v.name), conv = inV.filter((a) => converted.has(a.player_id)).length;
+        const ov = Object.keys(v.overrides || {});
+        return `<div class="row" style="grid-template-columns: 1fr 70px 110px">
+          <span><span class="font-mono text-xs">${escapeHtml(v.name)}</span>${ov.length ? `<span class="text-[11px] ml-2" style="color: var(--text-faint);">overrides ${ov.map(escapeHtml).join(", ")}</span>` : ""}</span>
+          <span class="font-mono text-xs text-right">${inV.length} in</span>
+          <span class="font-mono text-xs text-right">${x.metric_event ? `${inV.length ? Math.round((conv / inV.length) * 100) : 0}% <span style="color: var(--text-faint)">(${conv})</span>` : "&nbsp;"}</span></div>`;
+      }).join("")}</div>
+      ${assigned.length && assigned.length < 100 && x.metric_event ? `<p class="text-[11px] mt-2" style="color: var(--warn-ink); background: var(--warn-bg); padding: 6px 8px;">Under 100 players enrolled: differences this small are mostly noise.</p>` : ""}
+      <div class="flex gap-4 mt-3 text-[11px] font-semibold">
+        ${x.status === "draft" ? `<button class="start">Start</button><button class="edit">Edit</button>` : x.status === "running" ? `<button class="stop">Stop</button>` : `<button class="start">Restart</button>`}
+        <button class="del" style="color: var(--danger-text);">Delete</button></div>`;
+    const set = async (patch, msg) => { const { error } = await client.from("experiments").update(patch).eq("id", x.id); if (error) { showToast("Couldn't update.", true); return; } await logAudit("experiment_" + patch.status, { name: x.name }); showToast(msg); loadExperiments(); };
+    el.querySelector(".start") && (el.querySelector(".start").onclick = () => set({ status: "running", started_at: new Date().toISOString(), stopped_at: null }, "Experiment running. New sessions get a variant."));
+    el.querySelector(".stop") && (el.querySelector(".stop").onclick = () => { if (confirm("Stop this experiment? Players go back to normal Title Data.")) set({ status: "stopped", stopped_at: new Date().toISOString() }, "Experiment stopped."); });
+    el.querySelector(".edit") && (el.querySelector(".edit").onclick = () => editExperiment(x));
+    el.querySelector(".del").onclick = async () => {
+      if (!confirm(`Delete "${x.name}" and its assignments?`)) return;
+      await client.from("experiments").delete().eq("id", x.id); await logAudit("delete_experiment", { name: x.name }); loadExperiments();
+    };
+    list.appendChild(el);
+  }
+}
+
+// ---- Automation -------------------------------------------------------------
+let taskKind = "once";
+wireSeg("autoViewSeg", (v) => {
+  document.getElementById("tasksView").classList.toggle("hidden", v !== "tasks");
+  document.getElementById("hooksView").classList.toggle("hidden", v !== "hooks");
+  if (v === "hooks") loadWebhooks();
+});
+wireSeg("taskKindSeg", (v) => {
+  taskKind = v;
+  document.getElementById("taskRunAt").classList.toggle("hidden", v !== "once");
+  document.getElementById("taskTime").classList.toggle("hidden", v === "once");
+  document.getElementById("taskWeekday").classList.toggle("hidden", v !== "weekly");
+});
+document.getElementById("taskAction").onchange = renderTaskParams;
+async function renderTaskParams() {
+  const a = document.getElementById("taskAction").value, box = document.getElementById("taskParams");
+  const needsSeg = a === "grant_currency" || a === "add_tag";
+  document.getElementById("taskSegment").classList.toggle("hidden", !needsSeg);
+  if (a === "grant_currency") box.innerHTML = `<div class="flex gap-2"><input id="tpAmount" type="number" min="1" class="w-24 p-2.5 input-field text-sm" placeholder="Amount"><select id="tpCurrency" class="flex-1 p-2.5 input-field text-xs">${optCurrencies()}</select></div>`;
+  if (a === "add_tag") box.innerHTML = `<input id="tpTag" type="text" class="w-full p-2.5 input-field text-sm" placeholder="tag, e.g. weekend_2026_10">`;
+  if (a === "set_title_data") box.innerHTML = `<input id="tpKey" type="text" class="w-full p-2.5 mb-2 input-field text-sm font-mono" placeholder="key"><textarea id="tpValue" rows="2" class="w-full p-2.5 input-field text-sm" placeholder="value"></textarea>`;
+  if (a === "reset_statistic") box.innerHTML = `<input id="tpStat" type="text" class="w-full p-2.5 input-field text-sm font-mono" placeholder="stat name, e.g. weekly_kills">`;
+  if (a === "publish_news") {
+    const { data } = await client.from("title_news").select("id, title").eq("project_id", activeProject.id).eq("is_published", false).order("created_at", { ascending: false });
+    box.innerHTML = (data || []).length ? `<select id="tpNews" class="w-full p-2.5 input-field text-xs">${data.map((n) => `<option value="${n.id}">${escapeHtml(n.title)}</option>`).join("")}</select>` : `<p class="text-xs italic py-2" style="color: var(--text-faint);">No drafts. Write one in News first.</p>`;
+  }
+}
+function readTaskParams(a) {
+  const v = (id) => (document.getElementById(id) || {}).value;
+  if (a === "grant_currency") { const amount = parseInt(v("tpAmount"), 10); return amount > 0 && v("tpCurrency") ? { currency_id: v("tpCurrency"), amount } : null; }
+  if (a === "add_tag") return v("tpTag") && v("tpTag").trim() ? { tag: v("tpTag").trim() } : null;
+  if (a === "set_title_data") return v("tpKey") && v("tpKey").trim() ? { key: v("tpKey").trim(), value: v("tpValue") || "" } : null;
+  if (a === "reset_statistic") return v("tpStat") && v("tpStat").trim() ? { stat_name: v("tpStat").trim() } : null;
+  if (a === "publish_news") return v("tpNews") ? { news_id: v("tpNews") } : null;
+  return null;
+}
+function nextRunFrom(kind, runAt, time, weekday) {
+  if (kind === "once") return runAt ? new Date(runAt) : null;
+  const [h, m] = (time || "18:00").split(":").map(Number);
+  const d = new Date(); d.setSeconds(0, 0); d.setHours(h, m);
+  if (kind === "daily") { if (d <= new Date()) d.setDate(d.getDate() + 1); return d; }
+  const want = Number(weekday); let add = (want - d.getDay() + 7) % 7;
+  if (add === 0 && d <= new Date()) add = 7;
+  d.setDate(d.getDate() + add); return d;
+}
+async function submitTask() {
+  const name = document.getElementById("taskName").value.trim();
+  const action = document.getElementById("taskAction").value;
+  const params = readTaskParams(action);
+  if (!name || !params) { showToast("Give it a name and fill in what it should do.", true); return; }
+  const next = nextRunFrom(taskKind, document.getElementById("taskRunAt").value, document.getElementById("taskTime").value, document.getElementById("taskWeekday").value);
+  if (!next || (taskKind === "once" && next < new Date())) { showToast("Pick a time in the future.", true); return; }
+  // Recurring schedules are stored in UTC so the server can step them forward.
+  const row = { project_id: activeProject.id, name, action, params, segment_id: (action === "grant_currency" || action === "add_tag") ? (document.getElementById("taskSegment").value || null) : null,
+    schedule_kind: taskKind, next_run_at: next.toISOString(),
+    time_of_day: taskKind === "once" ? null : `${String(next.getUTCHours()).padStart(2, "0")}:${String(next.getUTCMinutes()).padStart(2, "0")}`,
+    weekday: taskKind === "weekly" ? next.getUTCDay() : null, is_active: true };
+  const { error } = await client.from("scheduled_tasks").insert([row]);
+  if (error) { if (!migrationMissing(error)) showToast("Couldn't schedule it.", true); return; }
+  await logAudit("create_task", { name, action });
+  document.getElementById("taskName").value = ""; loadTasks(); showToast(`Scheduled for ${fmtWhen(next)}.`);
+}
+function describeTask(t) {
+  const p = t.params || {};
+  const what = t.action === "grant_currency" ? `give ${p.amount} ${curName(p.currency_id)}`
+    : t.action === "add_tag" ? `tag "${p.tag}"`
+    : t.action === "set_title_data" ? `set ${p.key}`
+    : t.action === "publish_news" ? "publish a news draft"
+    : `end the "${p.stat_name}" season`;
+  const who = (t.action === "grant_currency" || t.action === "add_tag") ? (t.segment_id ? ` to ${segName(t.segment_id)}` : " to every player") : "";
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const local = t.next_run_at ? new Date(t.next_run_at) : null;
+  const when = t.schedule_kind === "once" ? "once" : t.schedule_kind === "daily" ? `daily at ${local ? local.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : t.time_of_day}` : `every ${local ? days[local.getDay()] : ""} at ${local ? local.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : t.time_of_day}`;
+  return `${what}${who}, ${when}`;
+}
+async function loadTasks() {
+  await ensureSegments();
+  document.getElementById("taskSegment").innerHTML = optSegments(document.getElementById("taskSegment").value, "Every player");
+  if (!document.getElementById("taskRunAt").value) { const d = new Date(Date.now() + 36e5); d.setMinutes(0); document.getElementById("taskRunAt").value = toLocalInput(d); }
+  renderTaskParams();
+  const { data, error } = await client.from("scheduled_tasks").select("*").eq("project_id", activeProject.id).order("next_run_at", { ascending: true, nullsFirst: false });
+  if (error) { migrationMissing(error); return; }
+  const list = document.getElementById("tasksList");
+  const rows = data || [];
+  if (!rows.length) { list.innerHTML = emptyNote("Nothing scheduled."); return; }
+  list.innerHTML = `<div style="border-top: 2px solid var(--text)"></div>`;
+  rows.forEach((t) => {
+    const el = document.createElement("div");
+    el.className = "row";
+    el.style.gridTemplateColumns = "1fr auto";
+    const failed = t.last_status && t.last_status.startsWith("error");
+    el.innerHTML = `<div class="min-w-0" style="${t.is_active ? "" : "opacity:.55"}">
+        <div class="font-semibold">${escapeHtml(t.name)}</div>
+        <div class="text-xs mt-0.5" style="color: var(--text-dim);">${escapeHtml(describeTask(t))}</div>
+        ${t.last_run_at ? `<div class="text-[11px] font-mono mt-1" style="color: ${failed ? "var(--danger-text)" : "var(--text-faint)"};">last ran ${fmtWhen(t.last_run_at)} · ${escapeHtml(t.last_status || "")}</div>` : ""}
+        <div class="flex gap-4 mt-2 text-[11px] font-semibold"><button class="run">Run now</button><button class="pause">${t.is_active ? "Pause" : "Resume"}</button><button class="del" style="color: var(--danger-text);">Delete</button></div></div>
+      <div class="text-right"><div class="uppercase text-[10px] tracking-widest" style="color: var(--text-faint);">Next</div><div class="font-mono text-xs mt-1">${t.is_active && t.next_run_at ? fmtWhen(t.next_run_at) : "none"}</div></div>`;
+    el.querySelector(".run").onclick = async () => {
+      if (!confirm(`Run "${t.name}" right now?`)) return;
+      const { data: res, error: e2 } = await client.rpc("dashboard_run_task", { p_task_id: t.id, p_advance: false });
+      if (e2) { showToast(e2.message || "It failed.", true); return; }
+      await logAudit("run_task", { name: t.name, result: res }); showToast(`Ran: ${res}.`); loadTasks(); fetchProjectData();
+    };
+    el.querySelector(".pause").onclick = async () => {
+      const patch = { is_active: !t.is_active };
+      if (!t.is_active && t.schedule_kind !== "once") patch.next_run_at = nextRunFrom(t.schedule_kind, null, new Date(t.next_run_at).toTimeString().slice(0, 5), new Date(t.next_run_at).getDay()).toISOString();
+      await client.from("scheduled_tasks").update(patch).eq("id", t.id); await logAudit(t.is_active ? "pause_task" : "resume_task", { name: t.name }); loadTasks();
+    };
+    el.querySelector(".del").onclick = async () => {
+      if (!confirm(`Delete "${t.name}"?`)) return;
+      await client.from("scheduled_tasks").delete().eq("id", t.id); await logAudit("delete_task", { name: t.name }); loadTasks();
+    };
+    list.appendChild(el);
+  });
+}
+async function loadWebhooks() {
+  const { data, error } = await client.from("webhooks").select("id, event_name, url, is_active, last_fired_at, last_status, created_at").eq("project_id", activeProject.id).order("created_at");
+  if (error) { migrationMissing(error); return; }
+  const list = document.getElementById("hooksList");
+  const rows = data || [];
+  if (!rows.length) { list.innerHTML = emptyNote("No webhooks yet."); return; }
+  list.innerHTML = `<div style="border-top: 2px solid var(--text)"></div>`;
+  rows.forEach((h) => {
+    const el = document.createElement("div");
+    el.className = "row";
+    el.style.gridTemplateColumns = "110px 1fr";
+    el.innerHTML = `<span class="font-mono text-xs" style="color: var(--accent-text);">${escapeHtml(h.event_name)}</span>
+      <div class="min-w-0" style="${h.is_active ? "" : "opacity:.55"}"><div class="font-mono text-xs truncate">${escapeHtml(h.url)}</div>
+        <div class="text-[11px] font-mono mt-1" style="color: var(--text-faint);">${h.last_fired_at ? "last sent " + fmtWhen(h.last_fired_at) + (h.last_status ? " · " + escapeHtml(h.last_status) : "") : "never sent"}</div>
+        <div class="flex gap-4 mt-2 text-[11px] font-semibold"><button class="test">Send test</button><button class="pause">${h.is_active ? "Pause" : "Resume"}</button><button class="del" style="color: var(--danger-text);">Delete</button></div></div>`;
+    el.querySelector(".test").onclick = async () => {
+      const { error: e2 } = await client.from("player_events").insert([{ project_id: activeProject.id, player_id: null, event_name: "webhook_test", data: { sent_by: currentUser.email } }]);
+      showToast(e2 ? "Couldn't queue the test." : "Test event queued. It goes to webhooks listening for webhook_test or *.", !!e2);
+      setTimeout(loadWebhooks, 2500);
+    };
+    el.querySelector(".pause").onclick = async () => { await client.from("webhooks").update({ is_active: !h.is_active }).eq("id", h.id); loadWebhooks(); };
+    el.querySelector(".del").onclick = async () => {
+      if (!confirm("Delete this webhook?")) return;
+      await client.from("webhooks").delete().eq("id", h.id); await logAudit("delete_webhook", { url: h.url }); loadWebhooks();
+    };
+    list.appendChild(el);
+  });
+}
+async function submitWebhook() {
+  const event_name = document.getElementById("hookEvent").value.trim();
+  const url = document.getElementById("hookUrl").value.trim();
+  if (!event_name || !/^https:\/\/\S+$/.test(url)) { showToast("Needs an event name and an https:// address.", true); return; }
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  const secret = "whsec_" + [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const { error } = await client.from("webhooks").insert([{ project_id: activeProject.id, event_name, url, secret, is_active: true }]);
+  if (error) { if (!migrationMissing(error)) showToast("Couldn't add the webhook.", true); return; }
+  await logAudit("create_webhook", { event_name, url });
+  ["hookEvent", "hookUrl"].forEach((id) => (document.getElementById(id).value = ""));
+  pendingRevealTarget = "webhook";
+  document.getElementById("revealTitle").innerText = "Webhook signing secret";
+  document.getElementById("revealDesc").innerText = "Your server uses this to check a call really came from ClouorVR (HMAC-SHA256 of the X-ClouorVR-Timestamp header, a dot, and the raw body). It's only shown now.";
+  document.getElementById("apiKeyRevealInput").value = secret;
+  document.getElementById("apiKeyRevealModal").classList.remove("hidden");
+  loadWebhooks();
 }
 
 </script>
